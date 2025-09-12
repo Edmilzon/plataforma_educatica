@@ -3,9 +3,10 @@ import { UserEntity } from "./entity/user.entity";
 import { JwtService } from "@nestjs/jwt" 
 import { InjectRepository } from "@nestjs/typeorm";
 import { UserDto } from "./dto/user.dto";
-import { BadRequestException, UnauthorizedException } from "@nestjs/common";
-import bcrypt from 'bcrypt';
+import { BadRequestException, Injectable, UnauthorizedException } from "@nestjs/common";
+import * as bcrypt from 'bcrypt';
 
+@Injectable()
 export class UserService{
     constructor(
         @InjectRepository(UserEntity)
