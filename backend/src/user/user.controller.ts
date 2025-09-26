@@ -14,8 +14,7 @@ export class UserController {
         const newUser = await this.userService.createUser(date);
         return {
             message: "Usuario creado correctamente",
-            status: 201,
-            newUser
+            status: 201
         }
     }
 
