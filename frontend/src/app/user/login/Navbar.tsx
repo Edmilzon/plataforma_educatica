@@ -9,9 +9,14 @@ export default function Navbar() {
 
   return (
     <nav className="w-full bg-gradient-to-r from-blue-900 to-blue-600 text-white shadow-md">
-      <div className="flex justify-between items-center px-4 py-3 md:px-8">
-       
-        <div className="text-2xl font-bold">
+      <div className="flex justify-between items-center px-4 py-5 md:px-8">
+           <button
+             className="md:hidden"
+               onClick={() => setIsOpen(!isOpen)}
+            >
+               {isOpen ? <X size={28} /> : <Menu size={28} />}
+          </button>
+        <div className="text-2xl font-bold"> 
           <Link href="/">Python</Link>
         </div>
 
@@ -31,13 +36,6 @@ export default function Navbar() {
           </Link>
         </div>
 
-       
-        <button
-          className="md:hidden"
-          onClick={() => setIsOpen(!isOpen)}
-        >
-          {isOpen ? <X size={28} /> : <Menu size={28} />}
-        </button>
       </div>
 
       
