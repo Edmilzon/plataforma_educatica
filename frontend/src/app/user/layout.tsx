@@ -6,10 +6,8 @@ export default function UserLayout({
     children: React.ReactNode
 }>){
     return (
-        <html>
-            <body>
+        <div>
                 {children}
-            </body>
-        </html>
+        </div>
     )
 }
