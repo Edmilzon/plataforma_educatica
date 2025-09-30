@@ -28,8 +28,11 @@ export default function Navbar() {
           <Link href="/about" className="hover:text-gray-200">
             Sobre nosotros
           </Link>
+          <Link href="/user/register" className="hover:text-gray-200">
+            Registrarse
+          </Link>
           <Link
-            href="/login"
+            href="/user/login"
             className="bg-green-500 hover:bg-green-600 px-4 py-2 rounded-full text-white"
           >
             Iniciar sesión
@@ -56,14 +59,20 @@ export default function Navbar() {
               Contáctanos
             </Link>
           </li>
+
           <li>
             <Link href="/about" onClick={() => setIsOpen(false)}>
               Sobre nosotros
             </Link>
           </li>
           <li>
+            <Link href="/user/register" onClick={() => setIsOpen(false)}>
+              Registrarse
+            </Link>
+          </li>
+          <li>
             <Link
-              href="/login"
+              href="/user/login"
               className="bg-green-500 px-4 py-2 rounded text-white text-center block"
               onClick={() => setIsOpen(false)}
             >
