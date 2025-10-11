@@ -1,8 +1,3 @@
-
 export default function Login() {
-    return (
-        <div>
-            hola desde login
-        </div>
-    )
+  return <div>hola desde login</div>;
 }

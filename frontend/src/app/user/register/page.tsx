@@ -1,7 +1,3 @@
 export default function Register() {
-    return(
-        <div>
-            Hola desde Registir 
-        </div>
-    )
+  return <div>Hola desde Registir</div>;
 }
