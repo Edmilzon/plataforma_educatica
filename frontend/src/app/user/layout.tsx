@@ -1,13 +1,6 @@
-import { Geist } from "next/font/google";
+// import { Geist } from "next/font/google";
 
-export default function UserLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
-  return (
-    <html>
-      <body>{children}</body>
-    </html>
-  );
-}
+const USER_LAYOUT = ({ children }: Readonly<{ children: React.ReactNode }>) => {
+  return <div>{children}</div>;
+};
+export default USER_LAYOUT;

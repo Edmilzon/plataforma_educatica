@@ -3,8 +3,8 @@ import { fileURLToPath } from "url";
 import { FlatCompat } from "@eslint/eslintrc";
 import tseslint from "typescript-eslint";
 import eslintPluginPrettierRecommended from "eslint-plugin-prettier/recommended";
-import eslintPluginImport from "eslint-plugin-import";
-import { match } from "assert";
+// import eslintPluginImport from "eslint-plugin-import";
+// import { match } from "assert";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
