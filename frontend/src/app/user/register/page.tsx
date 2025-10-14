@@ -120,10 +120,14 @@ const REGISTER = () => {
           {/* nombre y apellido */}
           <div className="mb-4 md:justify-between m-4 grid grid-cols-2 gap-4">
             <div className="mb-4 md:mr-2 md:mb-0">
-              <label className="text-[#190E5D] font-bold block text-sm">
+              <label
+                className="text-[#190E5D] font-bold block text-sm"
+                htmlFor="name"
+              >
                 Nombre <span className="text-red-500"> *</span>
               </label>
               <input
+                id="name"
                 type="text"
                 {...register("name")}
                 className="w-full px-3 py-2 text-sm leading-tight text-black border border-gray-300 placeholder-gray-400 rounded-lg shadow appearance-none focus:ring-2 focus:ring-[#306998]"
@@ -139,10 +143,14 @@ const REGISTER = () => {
             </div>
 
             <div className="md:ml-2">
-              <label className="text-[#190E5D] font-bold block text-sm">
+              <label
+                className="text-[#190E5D] font-bold block text-sm"
+                htmlFor="lastname"
+              >
                 Apellidos <span className="text-red-500"> *</span>
               </label>
               <input
+                id="lastname"
                 type="text"
                 {...register("lastname")}
                 className="w-full px-3 py-2 text-sm leading-tight text-black border border-gray-300 placeholder-gray-400 rounded-lg shadow appearance-none focus:ring-2 focus:ring-[#306998]"
@@ -159,10 +167,14 @@ const REGISTER = () => {
           </div>
           {/* Email */}
           <div className="mb-4 m-4">
-            <label className="text-[#190E5D] font-bold  block text-sm mb-1">
+            <label
+              className="text-[#190E5D] font-bold  block text-sm mb-1"
+              htmlFor="email"
+            >
               Email <span className="text-red-500"> *</span>
             </label>
             <input
+              id="email"
               type="email"
               {...register("email")}
               className="w-full px-3 py-2 text-sm leading-tight text-black border border-gray-300 placeholder-gray-400 rounded-lg shadow appearance-none focus:ring-2 focus:ring-[#306998]"
@@ -171,17 +183,22 @@ const REGISTER = () => {
             {errors.email ? (
               <p className="text-xs text-red-500 h-4">{errors.email.message}</p>
             ) : (
-              <p className="h-4"></p>
+              <p className="h3-4"></p>
             )}
           </div>
           {/* contrasenia y confirmar contrasenia */}
           <div className="mb-4 md:justify-between m-4 grid grid-cols-2 gap-4">
             <div className="md:mr-2 md:mb-0">
-              <label className="text-[#190E5D] font-bold  block text-sm mb-1">
+              <label
+                className="text-[#190E5D] font-bold  block text-sm mb-1"
+                htmlFor="password"
+              >
                 Contraseña <span className="text-red-500"> *</span>
               </label>
               <div className="relative">
                 <input
+                  data-testid="password"
+                  id="password"
                   type={show_password ? "text" : "password"}
                   {...register("password")}
                   className="w-full px-3 py-2 text-sm leading-tight text-black border border-gray-300 placeholder-gray-400 rounded-lg shadow appearance-none focus:ring-2 focus:ring-[#306998]"
@@ -208,11 +225,16 @@ const REGISTER = () => {
               )}
             </div>
             <div className="md:ml-2">
-              <label className="text-[#190E5D] font-bold  block text-sm mb-1">
+              <label
+                className="text-[#190E5D] font-bold  block text-sm mb-1"
+                htmlFor="confirm_password"
+              >
                 Confirmar contraseña <span className="text-red-500"> *</span>
               </label>
               <div className="relative">
                 <input
+                  data-testid="confirm_password"
+                  id="confirm_password"
                   type={show_confirm_password ? "text" : "password"}
                   {...register("confirm_password")}
                   className="w-full px-3 py-2 text-sm leading-tight text-black border border-gray-300 placeholder-gray-400 rounded-lg shadow appearance-none focus:ring-2 focus:ring-[#306998]"
@@ -243,10 +265,14 @@ const REGISTER = () => {
           </div>
           {/* telefono */}
           <div className="mb-4 m-4">
-            <label className="block text-[#190E5D] font-bold mb-1">
+            <label
+              className="block text-[#190E5D] font-bold mb-1"
+              htmlFor="phone"
+            >
               Telefono <span className="text-red-500"> *</span>
             </label>
             <input
+              id="phone"
               type="text"
               {...register("phone")}
               className="w-full px-3 py-2 text-sm leading-tight text-black border border-gray-300 placeholder-gray-400 rounded-lg shadow appearance-none focus:ring-2 focus:ring-[#306998]"

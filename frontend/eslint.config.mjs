@@ -24,6 +24,8 @@ const eslintConfig = [
       "out/**",
       "build/**",
       "next-env.d.ts",
+      "jest.config.ts",
+      "jest.setup.ts",
     ],
   },
 
@@ -111,6 +113,13 @@ const eslintConfig = [
         },
       ],
       "@next/next/no-img-element": "error",
+    },
+  },
+  {
+    files: ["**/*.test.ts", "**/*.test.tsx", "jest.config.ts", "jest.setup.ts"],
+    rules: {
+      "@typescript-eslint/naming-convention": "off",
+      "@typescript-eslint/no-explicit-any": "off",
     },
   },
 ];
