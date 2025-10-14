@@ -8,7 +8,7 @@ import { LuEye, LuEyeClosed } from "react-icons/lu";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 
-import { REGISTER_USER } from "@/app/api/user";
+import { REGISTER_USER } from "@/app/api/api";
 
 const REGISTER_SCHEMA = z
   .object({
@@ -113,10 +113,11 @@ const REGISTER = () => {
       </div>
       {/* lado der */}
       <div className="bg-white min-h-screen lg:p-20 md:p-16 sm:p-10 w-full lg:w-1/2 overflow-y-auto">
-        <h2 className="text-black text-2xl font-semibold text-center  mb-6 mt-5">
-          Crea tu cuenta
-        </h2>
         <form onSubmit={handle_submit(on_submit)}>
+          <h2 className="text-[#306998] text-3xl font-bold mb-6 mt-5">
+            Regístrate
+          </h2>
+          <p className="text-gray-600">Crea tu cuenta para empezar</p>
           {/* nombre y apellido */}
           <div className="mb-4 md:justify-between m-4 grid grid-cols-2 gap-4">
             <div className="mb-4 md:mr-2 md:mb-0">
@@ -153,7 +154,7 @@ const REGISTER = () => {
                 id="lastname"
                 type="text"
                 {...register("lastname")}
-                className="w-full px-3 py-2 text-sm leading-tight text-black border border-gray-300 placeholder-gray-400 rounded-lg shadow appearance-none focus:ring-2 focus:ring-[#306998]"
+                className="w-full px-3 py-2 text-sm leading-tight text-black border border-gray-300 placeholder-gray-400 rounded-lg shadow appearance-none focus:outline-none focus:ring-2 focus:ring-[#306998]"
                 placeholder="Apellido"
               />
               {errors.lastname ? (
@@ -286,7 +287,7 @@ const REGISTER = () => {
           </div>
 
           <div className="flex justify-center mt-2 mx-10">
-            <button className="flex items-center px-4 py-2 bg-gradient-to-r from-lime-600 via-lime-600 to-lime-600 text-white font-bold text-lg rounded-lg shadow-2xl hover:from-lime-600 hover:via-lime-600 hover:to-lime-600 focus:outline-none focus:ring-4 focus:ring-lime-100 focus:ring-opacity-70 active:bg-lime-600 active:shadow-inner transform hover:scale-110 transition duration-500 ease-in-out disabled:opacity-50 disabled:cursor-not-allowed ml-4">
+            <button className="w-full justify-center flex items-center px-4 py-2 bg-gradient-to-r from-lime-600 via-lime-600 to-lime-600 text-white font-bold text-lg rounded-lg shadow-2xl hover:from-lime-600 hover:via-lime-600 hover:to-lime-600 focus:outline-none focus:ring-4 focus:ring-lime-100 focus:ring-opacity-70 active:bg-lime-600 active:shadow-inner transform hover:scale-110 transition duration-500 ease-in-out disabled:opacity-50 disabled:cursor-not-allowed ml-4">
               Crear cuenta
             </button>
           </div>

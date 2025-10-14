@@ -24,7 +24,7 @@ import REGISTER from "../src/app/user/register/page";
 describe("REGISTER component", () => {
   it("renderiza los campos del formulario", () => {
     render(<REGISTER />);
-    expect(screen.getByText("Crea tu cuenta")).toBeInTheDocument();
+    expect(screen.getByText("Crea tu cuenta para empezar")).toBeInTheDocument();
     expect(screen.getByLabelText(/Nombre/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/Apellidos/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/Email/i)).toBeInTheDocument();

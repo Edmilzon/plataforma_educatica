@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_URL = "http://127.0.0.1:5000"; // tu backend local NestJS
+const API_URL = "http://127.0.0.1:5000"; // backend local NestJS
 
 type UserDataType = {
   name: string;
@@ -25,7 +25,6 @@ type LoginResponseType = {
     name: string;
     lastname: string;
     phone: string;
-    rol: string;
   };
 };
 
@@ -45,7 +44,7 @@ export const REGISTER_USER = async (user_data: UserDataType) => {
   }
 };
 
-// 🔹 Nueva función: Login
+// Nueva función: Login
 export const LOGIN_USER = async (
   login_data: LoginDataType,
 ): Promise<LoginResponseType> => {
@@ -54,6 +53,6 @@ export const LOGIN_USER = async (
     return response.data as LoginResponseType;
   } catch (error) {
     HANDLE_AXIOS_ERROR(error);
-    return error as never; // Añadido para evitar error de tipos
+    return error as never;
   }
 };
