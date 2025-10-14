@@ -25,14 +25,14 @@ export class UserService {
     if (validate)
       throw new BadRequestException('El correo o telefono ya existe');
 
-    const newUser = new UserEntity();
-    newUser.email = date.email;
-    newUser.password = await bcrypt.hash(date.password, 10);
-    newUser.name = date.name;
-    newUser.lastname = date.lastname;
-    newUser.phone = date.phone;
-    newUser.rol = date.rol;
-    return this.userRepository.save(newUser);
+    const new_user = new UserEntity();
+    new_user.email = date.email;
+    new_user.password = await bcrypt.hash(date.password, 10);
+    new_user.name = date.name;
+    new_user.lastname = date.lastname;
+    new_user.phone = date.phone;
+    new_user.role = date.rol;
+    return this.userRepository.save(new_user);
   }
 
   async validateExists(mail: string, phon: string): Promise<boolean> {
@@ -47,12 +47,16 @@ export class UserService {
     const user = await this.userRepository.findOne({
       where: { email: date.email },
     });
-    const validatePassword = await bcrypt.compare(
-      date.password,
-      user?.password,
-    );
-    if (!user || !validatePassword)
+    if (!user) {
       throw new UnauthorizedException('Credenciales incorrectas');
+    }
+    const validate_password = await bcrypt.compare(
+      date.password,
+      user.password,
+    );
+    if (!validate_password) {
+      throw new UnauthorizedException('Credenciales incorrectas');
+    }
 
     const payload = { sub: user.uuid_user, email: user.email };
     const token = this.jwtService.sign(payload);

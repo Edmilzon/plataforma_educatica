@@ -4,7 +4,7 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 
 describe('AppController', () => {
-  let appController: AppController;
+  let app_controller: AppController;
 
   beforeEach(async () => {
     const app: TestingModule = await Test.createTestingModule({
@@ -12,12 +12,12 @@ describe('AppController', () => {
       providers: [AppService],
     }).compile();
 
-    appController = app.get<AppController>(AppController);
+    app_controller = app.get<AppController>(AppController);
   });
 
   describe('root', () => {
     it('should return "Hello World!"', () => {
-      expect(appController.getHello()).toBe('Hello World!');
+      expect(app_controller.getHello()).toBe('Hello World!');
     });
   });
 });

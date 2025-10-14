@@ -7,7 +7,7 @@ import eslintPluginImport from 'eslint-plugin-import';
 
 export default tseslint.config(
   {
-    ignores: ['eslint.config.mjs'],
+    ignores: ['eslint.config.mjs', 'dist/'],
   },
   eslint.configs.recommended,
   ...tseslint.configs.recommendedTypeChecked,
@@ -72,7 +72,10 @@ export default tseslint.config(
 
       // MANTENIBILIDAD
       'complexity': ['error', 5],
-      '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
+      '@typescript-eslint/no-unused-vars': [
+        'error',
+        { argsIgnorePattern: '^_', varsIgnorePattern: '^_' },
+      ],
       'max-lines-per-function': ['warn', { max: 50, skipBlankLines: true, skipComments: true }],
 
       // SEGURIDAD / ESTRUCTURA

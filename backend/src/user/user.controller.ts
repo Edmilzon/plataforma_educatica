@@ -1,5 +1,4 @@
 import { Body, Controller, Post } from '@nestjs/common';
-import { log } from 'console';
 
 import { UserService } from './user.service';
 import { UserDto } from './dto/user.dto';
@@ -10,7 +9,7 @@ export class UserController {
 
   @Post('register')
   async resgisterUser(@Body() date: UserDto) {
-    const newUser = await this.userService.createUser(date);
+    await this.userService.createUser(date);
     return {
       message: 'Usuario creado correctamente',
       status: 201,
@@ -20,12 +19,12 @@ export class UserController {
   @Post('login')
   async loginUser(@Body() date: UserDto) {
     const login = await this.userService.loginUser(date);
-    const { password, ...userNotPassword } = login.user;
+    const { password: _password, ...user_not_password } = login.user;
     return {
       message: 'Login exitoso',
       status: 200,
       token: login.token,
-      login: userNotPassword,
+      login: user_not_password,
     };
   }
 }

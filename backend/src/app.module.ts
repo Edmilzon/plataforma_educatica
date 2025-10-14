@@ -12,6 +12,7 @@ import { UserModule } from './user/user.module';
     TypeOrmModule.forRoot({
       type: 'postgres',
       url: process.env.DB_URL,
+      // eslint-disable-next-line @typescript-eslint/naming-convention
       autoLoadEntities: true,
       synchronize: true,
     }),

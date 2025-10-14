@@ -13,6 +13,7 @@ import { UserController } from './user.controller';
     TypeOrmModule.forFeature([UserEntity]),
     JwtModule.register({
       secret: process.env.JWT_SECRET,
+      // eslint-disable-next-line @typescript-eslint/naming-convention
       signOptions: { expiresIn: '1h' },
     }),
   ],

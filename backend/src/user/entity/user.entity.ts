@@ -21,5 +21,5 @@ export class UserEntity {
   phone: string;
 
   @Column({ length: 50, default: 'usuario' })
-  rol: string;
+  role: string;
 }
