@@ -99,3 +99,8 @@ Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
 
 npx eslint .
 npm run build
+
+npx eslint . --fix
+
+#EJECUTA LOS TEST 
+export DB_URL='postgresql://neondb_owner:npg_YTJ0DsB9ZFGE@ep-muddy-bread-a21balh3-pooler.eu-central-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require' && npm run test:e2e
