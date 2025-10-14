@@ -1,3 +1,4 @@
-export default function User() {
-  return <div>Hola desde Ususarios</div>;
-}
+const USER = () => {
+  return <div>hola desde register</div>;
+};
+export default USER;

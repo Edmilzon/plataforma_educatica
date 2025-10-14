@@ -1,3 +1,4 @@
-export default function Register() {
-  return <div>Hola desde Registir</div>;
-}
+const REGISTER = () => {
+  return <div>hola desde register</div>;
+};
+export default REGISTER;
