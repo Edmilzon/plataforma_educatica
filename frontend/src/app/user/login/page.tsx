@@ -3,10 +3,13 @@ import Image from "next/image";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { LuEye, LuEyeClosed } from "react-icons/lu";
 import { FaGoogle, FaMicrosoft } from "react-icons/fa";
+
+import { LOGIN_USER } from "@/app/api/api";
 
 const LOGIN_SCHEMA = z.object({
   email: z.string().email("Correo inválido"),
@@ -16,6 +19,7 @@ const LOGIN_SCHEMA = z.object({
 type LoginForm = z.infer<typeof LOGIN_SCHEMA>;
 
 const LOGIN_PAGE = () => {
+  const router = useRouter();
   const {
     register,
     handleSubmit: handle_submit,
@@ -25,9 +29,32 @@ const LOGIN_PAGE = () => {
   });
 
   const [show_password, set_show_password] = useState(false);
+  const [loading, set_loading] = useState(false);
+  const [error, set_error] = useState("");
 
-  const on_submit = (data: LoginForm) => {
-    console.log("Datos enviados:", data);
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (token) router.push("/user/home");
+  }, [router]);
+
+  const on_submit = async (data: LoginForm) => {
+    try {
+      set_loading(true);
+      set_error("");
+      const response = await LOGIN_USER(data);
+
+      if (response?.token) {
+        localStorage.setItem("token", response.token);
+        localStorage.setItem("user", JSON.stringify(response.login));
+        router.push("/user/home"); 
+      }
+    } catch (error: unknown) {
+    
+      set_error("Usuario o email no registrado");
+      console.log(error);
+    } finally {
+      set_loading(false);
+    }
   };
 
   return (
@@ -78,7 +105,6 @@ const LOGIN_PAGE = () => {
                   className="mt-1 w-full rounded-lg border px-3 py-2 text-black placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#FFD43B]"
                   placeholder="********"
                 />
-
                 <button
                   className="absolute inset-y-0 right-3 flex items-center text-gray-500 hover:text-black cursor-pointer"
                   type="button"
@@ -106,11 +132,16 @@ const LOGIN_PAGE = () => {
 
             <button
               className="w-full rounded-lg bg-[#306998] px-4 py-2 text-white font-semibold hover:bg-[#205375] transition transform hover:scale-105 shadow-md cursor-pointer"
+              disabled={loading}
               type="submit"
             >
-              Iniciar sesión
+              {loading ? "Iniciando..." : "Iniciar sesión"}
             </button>
           </form>
+
+          {error && (
+            <p className="text-left text-red-500 text-sm mt-2">{error}</p>
+          )}
 
           <div className="flex items-center gap-2">
             <div className="h-px flex-1 bg-gray-300"></div>
