@@ -131,7 +131,7 @@ const REGISTER = () => {
                 id="name"
                 type="text"
                 {...register("name")}
-                className="w-full px-3 py-2 text-sm leading-tight text-black border border-gray-300 placeholder-gray-400 rounded-lg shadow appearance-none focus:ring-2 focus:ring-[#306998]"
+                className="mt-1 w-full rounded-lg border px-3 py-2 text-black placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#306998]"
                 placeholder="Nombre"
               />
               {errors.name ? (
@@ -154,7 +154,7 @@ const REGISTER = () => {
                 id="lastname"
                 type="text"
                 {...register("lastname")}
-                className="w-full px-3 py-2 text-sm leading-tight text-black border border-gray-300 placeholder-gray-400 rounded-lg shadow appearance-none focus:outline-none focus:ring-2 focus:ring-[#306998]"
+                className="mt-1 w-full rounded-lg border px-3 py-2 text-black placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#306998]"
                 placeholder="Apellido"
               />
               {errors.lastname ? (
@@ -178,7 +178,7 @@ const REGISTER = () => {
               id="email"
               type="email"
               {...register("email")}
-              className="w-full px-3 py-2 text-sm leading-tight text-black border border-gray-300 placeholder-gray-400 rounded-lg shadow appearance-none focus:ring-2 focus:ring-[#306998]"
+              className="mt-1 w-full rounded-lg border px-3 py-2 text-black placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#306998]"
               placeholder="ejemplo@gmail.com"
             />
             {errors.email ? (
@@ -202,7 +202,7 @@ const REGISTER = () => {
                   id="password"
                   type={show_password ? "text" : "password"}
                   {...register("password")}
-                  className="w-full px-3 py-2 text-sm leading-tight text-black border border-gray-300 placeholder-gray-400 rounded-lg shadow appearance-none focus:ring-2 focus:ring-[#306998]"
+                  className="mt-1 w-full rounded-lg border px-3 py-2 text-black placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#306998]"
                   placeholder="********"
                 />
                 <button
@@ -238,7 +238,7 @@ const REGISTER = () => {
                   id="confirm_password"
                   type={show_confirm_password ? "text" : "password"}
                   {...register("confirm_password")}
-                  className="w-full px-3 py-2 text-sm leading-tight text-black border border-gray-300 placeholder-gray-400 rounded-lg shadow appearance-none focus:ring-2 focus:ring-[#306998]"
+                  className="mt-1 w-full rounded-lg border px-3 py-2 text-black placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#306998]"
                   placeholder="********"
                 />
                 <button
@@ -265,7 +265,7 @@ const REGISTER = () => {
             </div>
           </div>
           {/* telefono */}
-          <div className="mb-4 m-4">
+          <div className="mb-4 mx-4">
             <label
               className="block text-[#190E5D] font-bold mb-1"
               htmlFor="phone"
@@ -276,7 +276,7 @@ const REGISTER = () => {
               id="phone"
               type="text"
               {...register("phone")}
-              className="w-full px-3 py-2 text-sm leading-tight text-black border border-gray-300 placeholder-gray-400 rounded-lg shadow appearance-none focus:ring-2 focus:ring-[#306998]"
+              className="mt-1 w-full rounded-lg border px-3 py-2 text-black placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#306998]"
               placeholder="Numero de celular"
             />
             {errors.phone ? (

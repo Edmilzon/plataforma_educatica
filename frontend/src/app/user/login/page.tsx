@@ -101,7 +101,7 @@ const LOGIN_PAGE = () => {
                 <input
                   type={show_password ? "text" : "password"}
                   {...register("password")}
-                  className="mt-1 w-full rounded-lg border px-3 py-2 text-black placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#FFD43B]"
+                  className="mt-1 w-full rounded-lg border px-3 py-2 text-black placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#306998]"
                   placeholder="********"
                 />
                 <button
