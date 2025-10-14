@@ -60,7 +60,7 @@ jobs:
           JWT_SECRET: ${{ secrets.JWT_SECRET }}
           PORT: 5000 
           
-        run: npm run test:cov
+        run: npm run test:e2e -- --coverage
 
       - name: 3. Build NestJS Application
         run: npm run build
