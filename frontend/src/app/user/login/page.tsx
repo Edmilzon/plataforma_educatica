@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 "use client";
 import Image from "next/image";
 import { useForm } from "react-hook-form";
@@ -142,3 +143,9 @@ export default function LoginPage() {
     </div>
   );
 }
+=======
+const LOGIN = () => {
+  return <div>hola desde login</div>;
+};
+export default LOGIN;
+>>>>>>> feature/H1_Register

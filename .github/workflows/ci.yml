@@ -1,0 +1,98 @@
+name: CI / Quality & Testing Pipeline
+
+on:
+  push:
+    branches:
+      - main
+      - feature/**
+  pull_request:
+    branches:
+      - main
+      
+jobs:
+  # =======================================================
+  # JOB 1: Pipeline del Backend (NestJS)
+  # =======================================================
+  backend-pipeline:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./backend
+    
+    services:
+      postgres:
+        image: postgres:15-alpine
+        env:
+          POSTGRES_USER: test_user
+          POSTGRES_PASSWORD: test_password
+          POSTGRES_DB: test_db
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+      
+      - name: Setup Node.js 20.x
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm' 
+          cache-dependency-path: './backend/package-lock.json' 
+
+      - name: Install Backend Dependencies
+        run: npm ci
+
+      - name: Wait for Postgres to be ready
+        run: while ! nc -z localhost 5432; do sleep 1; done
+        
+      - name: 1. Run Linter (Forzar Convenciones)
+        run: npm run lint
+      
+      - name: 2. Run Unit & Integration Tests (JEST)
+        env:
+          DB_URL: postgres://test_user:test_password@localhost:5432/test_db
+          JWT_SECRET: ${{ secrets.JWT_SECRET }}
+          PORT: 5000 
+          
+        run: npm run test:cov
+
+      - name: 3. Build NestJS Application
+        run: npm run build
+  
+  # =======================================================
+  # JOB 2: Pipeline del Frontend (Next.js)
+  # =======================================================
+  frontend-pipeline:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./frontend 
+        
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 20.x
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: './frontend/package-lock.json'
+
+      - name: Install Frontend Dependencies
+        run: npm ci
+
+      - name: 1. Run Linter (Next.js & Conventions)
+        run: npm run lint
+
+      - name: 2. Run Unit & Integration Tests (JEST)
+        run: npm run test:cov
+
+      - name: 3. Build Next.js Application
+        run: npm run build
