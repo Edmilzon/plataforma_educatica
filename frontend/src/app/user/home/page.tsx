@@ -2,10 +2,10 @@
 
 import { useSession } from "next-auth/react";
 import { useEffect } from "react";
-
+import { useRouter } from "next/navigation";
 const HOME = () => {
   const { data: session } = useSession();
-
+  const router = useRouter();
   useEffect(() => {
     if (session?.accessToken && session?.userData) {
       sessionStorage.setItem("token", session.accessToken);
@@ -15,9 +15,10 @@ const HOME = () => {
         token: session.accessToken,
         user: session.userData,
       });
+      router.push("/");
     }
-  }, [session]);
+  }, [session, router]);
 
-  return <div>Bienvenido {session?.userData?.name}</div>;
+  return null;
 };
 export default HOME;
