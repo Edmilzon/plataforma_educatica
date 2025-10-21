@@ -7,7 +7,6 @@ type UserDataType = {
   lastname: string;
   email: string;
   password: string;
-  phone: string;
 };
 
 type LoginDataType = {
@@ -49,7 +48,7 @@ export const LOGIN_USER = async (
   login_data: LoginDataType,
 ): Promise<LoginResponseType> => {
   try {
-    const response = await axios.post(`${API_URL}/user/login`, login_data);
+    const response = await axios.post(`${API_URL}/auth/login`, login_data);
     return response.data as LoginResponseType;
   } catch (error) {
     HANDLE_AXIOS_ERROR(error);

@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -8,6 +8,7 @@ import { FcGoogle } from "react-icons/fc";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { signIn } from "next-auth/react";
+import { useSession } from "next-auth/react";
 
 import { REGISTER_USER } from "@/app/api/api";
 
@@ -44,13 +45,6 @@ const REGISTER_SCHEMA = z
         "Debe contener al menos un número o un caracter especial",
       ),
     confirm_password: z.string().nonempty("El campo es obligatorio"),
-    phone: z
-      .string()
-      .nonempty("El campo es obligatorio")
-      .regex(
-        /^[67]\d{7}$/,
-        "El número debe empezar con 6 o 7 y tener 8 dígitos",
-      ),
   })
   .refine((data) => data.password === data.confirm_password, {
     message: "Las contraseñas no coinciden",
@@ -66,6 +60,14 @@ const REGISTER = () => {
   const [show_password, set_show_password] = useState(false);
   const [show_confirm_password, set_show_confirm_password] = useState(false);
   const router = useRouter();
+
+  const { data: session, status } = useSession();
+  useEffect(() => {
+    if (status === "authenticated" && session?.user) {
+      sessionStorage.setItem("user", JSON.stringify(session.user));
+      router.push("/user/home");
+  }
+}, [session, status, router]);
 
   const {
     register,

@@ -7,17 +7,14 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { LuEye, LuEyeClosed } from "react-icons/lu";
-// import { FaGoogle, FaMicrosoft } from "react-icons/fa";
-
+//import { FcGoogle } from "react-icons/fc";
 import { LOGIN_USER } from "@/app/api/api";
-
+import GoogleBtn from "@/app/components/googleBtn";
 const LOGIN_SCHEMA = z.object({
   email: z.string().email("Correo inválido"),
   password: z.string().min(6, "Mínimo 6 caracteres"),
 });
-
 type LoginForm = z.infer<typeof LOGIN_SCHEMA>;
-// eslint-disable-next-line max-lines-per-function, complexity
 const LOGIN_PAGE = () => {
   const router = useRouter();
   const {
@@ -130,7 +127,7 @@ const LOGIN_PAGE = () => {
             </div>
 
             <button
-              className="w-full justify-center flex items-center px-4 py-2 bg-gradient-to-r from-lime-600 via-lime-600 to-lime-600 text-white font-bold text-lg rounded-lg shadow-2xl hover:from-lime-600 hover:via-lime-600 hover:to-lime-600 focus:outline-none focus:ring-4 focus:ring-lime-100 focus:ring-opacity-70 active:bg-lime-600 active:shadow-inner transform hover:scale-110 transition duration-500 ease-in-out disabled:opacity-50 disabled:cursor-not-allowed ml-4"
+              className="w-full rounded-lg bg-[#65a30d] px-4 py-2 text-white font-semibold hover:from-lime-600 transition transform hover:scale-105 shadow-md cursor-pointer"
               disabled={loading}
               type="submit"
             >
@@ -140,25 +137,21 @@ const LOGIN_PAGE = () => {
 
           {error && (
             <p className="text-left text-red-500 text-sm mt-2">{error}</p>
-          )}
-          {/* 
+          )} 
+          
           <div className="flex items-center gap-2">
             <div className="h-px flex-1 bg-gray-300"></div>
             <span className="text-sm text-gray-500">o</span>
             <div className="h-px flex-1 bg-gray-300"></div>
           </div>
-
+          {/*
           <div className="flex gap-4">
             <button className="flex-1 border rounded-lg py-2 flex items-center justify-center gap-2 hover:bg-gray-100 transition transform hover:scale-105 shadow-sm cursor-pointer">
-              <FaGoogle className="text-red-500" size={20} />
+              <FcGoogle className="text-red-500" size={20} />
               <span className="text-black font-medium ">Google</span>
             </button>
-            <button className="flex-1 border rounded-lg py-2 flex items-center justify-center gap-2 hover:bg-gray-100 transition transform hover:scale-105 shadow-sm cursor-pointer">
-              <FaMicrosoft className="text-blue-500" size={20} />
-              <span className="text-black font-medium ">Apple</span>
-            </button>
-          </div> */}
-
+          </div>*/} 
+          <GoogleBtn />
           <p className="text-center text-sm text-gray-600 ">
             ¿No tienes cuenta?{" "}
             <Link
