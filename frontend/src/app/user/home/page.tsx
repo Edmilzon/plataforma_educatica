@@ -1,10 +1,9 @@
-// src/app/user/home/page.tsx
-"use client"; // <- esto es obligatorio
+"use client";
 
 import { useSession } from "next-auth/react";
 import { useEffect } from "react";
 
-export default function Home() {
+const HOME = () => {
   const { data: session } = useSession();
 
   useEffect(() => {
@@ -20,4 +19,5 @@ export default function Home() {
   }, [session]);
 
   return <div>Bienvenido {session?.userData?.name}</div>;
-}
+};
+export default HOME;
