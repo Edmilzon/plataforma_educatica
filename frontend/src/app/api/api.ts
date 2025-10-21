@@ -55,3 +55,25 @@ export const LOGIN_USER = async (
     return error as never;
   }
 };
+
+export const VALIDATE_EMAIL_USER = async (email_data: { email: string }) => {
+  try {
+    const response = await axios.post(
+      `${API_URL}/user/validate-email`,
+      email_data,
+    );
+    return response.data;
+  } catch (error) {
+    HANDLE_AXIOS_ERROR(error);
+  }
+};
+export const LOGIN_GOOGLE_USER = async (email: string) => {
+  try {
+    const response = await axios.post(`${API_URL}/auth/google/signin`, {
+      email,
+    });
+    return response.data;
+  } catch (error) {
+    HANDLE_AXIOS_ERROR(error);
+  }
+};

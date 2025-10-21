@@ -1,4 +1,4 @@
-import NextAuth from "next-auth";
+import NextAuth from "next-auth/next";
 import GoogleProvider from "next-auth/providers/google";
 import axios from "axios";
 
@@ -10,48 +10,61 @@ type GoogleProfile = {
   picture: string;
 };
 
-const handler = NextAuth({
+import { VALIDATE_EMAIL_USER, LOGIN_GOOGLE_USER } from "@/app/api/api";
+
+const HANDLER = NextAuth({
   providers: [
     GoogleProvider({
+      // eslint-disable-next-line @typescript-eslint/naming-convention
       clientId: process.env.GOOGLE_CLIENT_ID!,
+      // eslint-disable-next-line @typescript-eslint/naming-convention
       clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
     }),
   ],
 
-  secret: process.env.NEXTAUTH_SECRET,
-  session: { strategy: "jwt" },
-
   callbacks: {
-    async jwt({ token, account, profile }) {
-      if (account && profile) {
-        const googleProfile = profile as GoogleProfile;
+    async signIn({ user }) {
+      if (!user.email) return false;
 
-        try {
-          await axios.post("http://localhost:5000/auth/google/signin", {
-            email: googleProfile.email,
-            name: googleProfile.given_name || googleProfile.name,
-            lastname: googleProfile.family_name || "",
-          });
-        } catch (error) {
-          console.error("Error al registrar con Google:", error);
-        }
-
-        token.user = {
-          email: googleProfile.email,
-          name: googleProfile.given_name || googleProfile.name,
-          lastname: googleProfile.family_name || "",
-          picture: googleProfile.picture,
-        };
+      const exists = await VALIDATE_EMAIL_USER({ email: user.email });
+      if (!exists?.exists) {
+        console.log("Usuario no registrado:", user.email);
+        return "/user/register";
       }
 
+      try {
+        const login_data = await LOGIN_GOOGLE_USER(user.email);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (user as any).apiToken = login_data.token;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (user as any).apiUser = login_data.user;
+
+        return true;
+      } catch (error) {
+        console.error("Error en login Google API:", error);
+        return false;
+      }
+    },
+
+    async jwt({ token, user }) {
+      if (user) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        token.apiToken = (user as any).apiToken;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        token.apiUser = (user as any).apiUser;
+      }
       return token;
     },
 
     async session({ session, token }) {
-      session.user = token.user as any;
+      // Cast explícito para evitar el error de TS
+      session.accessToken = token.apiToken as string | undefined;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      session.userData = token.apiUser as Record<string, any> | undefined;
+
       return session;
     },
   },
 });
 
-export { handler as GET, handler as POST };
+export { HANDLER as GET, HANDLER as POST };

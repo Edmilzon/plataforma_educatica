@@ -7,6 +7,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { LuEye, LuEyeClosed } from "react-icons/lu";
+
 //import { FcGoogle } from "react-icons/fc";
 import { LOGIN_USER } from "@/app/api/api";
 import GoogleBtn from "@/app/components/googleBtn";
@@ -15,6 +16,7 @@ const LOGIN_SCHEMA = z.object({
   password: z.string().min(6, "Mínimo 6 caracteres"),
 });
 type LoginForm = z.infer<typeof LOGIN_SCHEMA>;
+/* eslint-disable-next-line complexity */
 const LOGIN_PAGE = () => {
   const router = useRouter();
   const {
@@ -137,20 +139,13 @@ const LOGIN_PAGE = () => {
 
           {error && (
             <p className="text-left text-red-500 text-sm mt-2">{error}</p>
-          )} 
-          
+          )}
+
           <div className="flex items-center gap-2">
             <div className="h-px flex-1 bg-gray-300"></div>
             <span className="text-sm text-gray-500">o</span>
             <div className="h-px flex-1 bg-gray-300"></div>
           </div>
-          {/*
-          <div className="flex gap-4">
-            <button className="flex-1 border rounded-lg py-2 flex items-center justify-center gap-2 hover:bg-gray-100 transition transform hover:scale-105 shadow-sm cursor-pointer">
-              <FcGoogle className="text-red-500" size={20} />
-              <span className="text-black font-medium ">Google</span>
-            </button>
-          </div>*/} 
           <GoogleBtn />
           <p className="text-center text-sm text-gray-600 ">
             ¿No tienes cuenta?{" "}

@@ -5,6 +5,7 @@ import {
   Injectable,
 } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
+import * as crypto from 'crypto';
 
 import { UserDto } from './dto/user.dto';
 import { UserEntity } from './entity/user.entity';
@@ -28,6 +29,7 @@ export class UserService {
     new_user.name = date.name;
     new_user.lastname = date.lastname;
     new_user.role = date.role;
+    new_user.confirmationToken = crypto.randomBytes(32).toString('hex');
     return this.userRepository.save(new_user);
   }
 
@@ -40,6 +42,11 @@ export class UserService {
   
   async search_email (email: string): Promise<UserEntity | undefined>{
     const user = await this.userRepository.findOne({where: {email}});
+    return user ?? undefined;
+  }
+
+  async findByConfirmationToken(token: string): Promise<UserEntity | undefined> {
+    const user = await this.userRepository.findOne({ where: { confirmationToken: token } });
     return user ?? undefined;
   }
 }
