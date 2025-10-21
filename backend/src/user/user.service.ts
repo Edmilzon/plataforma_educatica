@@ -66,4 +66,9 @@ export class UserService {
       user,
     };
   }
+  
+  async search_email (email: string): Promise<UserEntity | undefined>{
+    const user = await this.userRepository.findOne({where: {email}});
+    return user ?? undefined;
+  }
 }
