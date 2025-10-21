@@ -1,11 +1,11 @@
-import { Module } from "@nestjs/common";
-import { ConfigModule, ConfigService } from "@nestjs/config";
-import { JwtModule } from "@nestjs/jwt";
-import { PassportModule } from "@nestjs/passport";
-import { UserModule } from "src/user/user.module";
-import { AuthService } from "./auth.service";
-import { AuthController } from "./auth.controller";
+import { Module } from '@nestjs/common';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+import { JwtModule } from '@nestjs/jwt';
+import { PassportModule } from '@nestjs/passport';
+import { UserModule } from 'src/user/user.module';
 
+import { AuthService } from './auth.service';
+import { AuthController } from './auth.controller';
 
 @Module({
   imports: [
@@ -25,4 +25,4 @@ import { AuthController } from "./auth.controller";
   controllers: [AuthController],
   exports: [AuthService],
 })
-export class AuthModule{} 
+export class AuthModule {}

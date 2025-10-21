@@ -20,7 +20,7 @@ import { EmailModule } from './email/email.module';
     }),
     UserModule,
     AuthModule,
-    EmailModule
+    EmailModule,
   ],
   controllers: [AppController],
   providers: [AppService],

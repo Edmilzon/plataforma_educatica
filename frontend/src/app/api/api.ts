@@ -23,7 +23,6 @@ type LoginResponseType = {
     email: string;
     name: string;
     lastname: string;
-    phone: string;
   };
 };
 

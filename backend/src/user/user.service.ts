@@ -1,9 +1,6 @@
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
-import {
-  BadRequestException,
-  Injectable,
-} from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 import * as crypto from 'crypto';
 
@@ -14,7 +11,7 @@ import { UserEntity } from './entity/user.entity';
 export class UserService {
   constructor(
     @InjectRepository(UserEntity)
-    public readonly userRepository: Repository<UserEntity>
+    public readonly userRepository: Repository<UserEntity>,
   ) {}
 
   //Register user
@@ -39,14 +36,18 @@ export class UserService {
     });
     return validate;
   }
-  
-  async search_email (email: string): Promise<UserEntity | undefined>{
-    const user = await this.userRepository.findOne({where: {email}});
+
+  async search_email(email: string): Promise<UserEntity | undefined> {
+    const user = await this.userRepository.findOne({ where: { email } });
     return user ?? undefined;
   }
 
-  async findByConfirmationToken(token: string): Promise<UserEntity | undefined> {
-    const user = await this.userRepository.findOne({ where: { confirmationToken: token } });
+  async findByConfirmationToken(
+    token: string,
+  ): Promise<UserEntity | undefined> {
+    const user = await this.userRepository.findOne({
+      where: { confirmationToken: token },
+    });
     return user ?? undefined;
   }
 }

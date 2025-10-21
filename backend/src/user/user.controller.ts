@@ -1,7 +1,12 @@
-import { Body, Controller, InternalServerErrorException, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  InternalServerErrorException,
+  Post,
+} from '@nestjs/common';
+import { EmailService } from 'src/email/email.service';
 
 import { UserService } from './user.service';
-import { EmailService } from 'src/email/email.service';
 import { UserDto } from './dto/user.dto';
 
 @Controller('user')
@@ -16,7 +21,9 @@ export class UserController {
     const user = await this.userService.registerUser(date);
 
     if (!user.confirmationToken) {
-      throw new InternalServerErrorException('No se pudo generar el token de confirmación.');
+      throw new InternalServerErrorException(
+        'No se pudo generar el token de confirmación.',
+      );
     }
 
     await this.emailService.sendConfirmationEmail(user, user.confirmationToken);
@@ -25,13 +32,15 @@ export class UserController {
       status: 201,
     };
   }
-  
+
   @Post('validate-email')
-  async validateEmail(@Body('email') email: string){
-    const exists = await this.userService.validateExists(email)
+  async validateEmail(@Body('email') email: string) {
+    const exists = await this.userService.validateExists(email);
     return {
       exists,
-      message: exists ? 'El correo ya esta registrado' :'El usuario no existe '
-    }
+      message: exists
+        ? 'El correo ya esta registrado'
+        : 'El usuario no existe ',
+    };
   }
 }
