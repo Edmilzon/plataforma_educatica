@@ -144,13 +144,6 @@ const LOGIN_PAGE = () => {
             <span className="text-sm text-gray-500">o</span>
             <div className="h-px flex-1 bg-gray-300"></div>
           </div>
-          {/*
-          <div className="flex gap-4">
-            <button className="flex-1 border rounded-lg py-2 flex items-center justify-center gap-2 hover:bg-gray-100 transition transform hover:scale-105 shadow-sm cursor-pointer">
-              <FcGoogle className="text-red-500" size={20} />
-              <span className="text-black font-medium ">Google</span>
-            </button>
-          </div>*/} 
           <GoogleBtn />
           <p className="text-center text-sm text-gray-600 ">
             ¿No tienes cuenta?{" "}
