@@ -9,22 +9,19 @@ export class UserController {
 
   @Post('register')
   async resgisterUser(@Body() date: UserDto) {
-    await this.userService.createUser(date);
+    await this.userService.registerUser(date);
     return {
       message: 'Usuario creado correctamente',
       status: 201,
     };
   }
-
-  @Post('login')
-  async loginUser(@Body() date: UserDto) {
-    const login = await this.userService.loginUser(date);
-    const { password: _password, ...user_not_password } = login.user;
+  
+  @Post('validate-email')
+  async validateEmail(@Body('email') email: string){
+    const exists = await this.userService.validateExists(email)
     return {
-      message: 'Login exitoso',
-      status: 200,
-      token: login.token,
-      login: user_not_password,
-    };
+      exists,
+      message: exists ? 'El correo ya esta registrado' :'El usuario no existe '
+    }
   }
 }
