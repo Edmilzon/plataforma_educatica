@@ -1,5 +1,5 @@
 
-import { Body, Controller, Post } from "@nestjs/common";
+import { Body, Controller, Get, Post, Query } from "@nestjs/common";
 import { AuthService } from "./auth.service";
 import { AuthDto } from "./dto/auth.dto";
 import { GoogleAuthDto } from "./dto/google-auth.dto";
@@ -16,5 +16,10 @@ export class AuthController {
     @Post('google/signin')
     async googleSignIn(@Body() data: GoogleAuthDto) {
         return this.authService.signInWithGoogle(data);
+    }
+
+    @Get('confirm')
+    async confirm(@Query('token') token: string) {
+        return this.authService.confirmEmail(token);
     }
 }

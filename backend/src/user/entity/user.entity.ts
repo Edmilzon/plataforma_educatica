@@ -19,4 +19,10 @@ export class UserEntity {
 
   @Column({ length: 50, default: 'student' })
   role: string;
+
+  @Column({ default: false })
+  isConfirmed: boolean;
+
+  @Column({ type: 'varchar', nullable: true })
+  confirmationToken: string | null;
 }

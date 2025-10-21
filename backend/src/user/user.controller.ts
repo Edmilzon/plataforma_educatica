@@ -1,15 +1,25 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import { Body, Controller, InternalServerErrorException, Post } from '@nestjs/common';
 
 import { UserService } from './user.service';
+import { EmailService } from 'src/email/email.service';
 import { UserDto } from './dto/user.dto';
 
 @Controller('user')
 export class UserController {
-  constructor(private readonly userService: UserService) {}
+  constructor(
+    private readonly userService: UserService,
+    private readonly emailService: EmailService,
+  ) {}
 
   @Post('register')
   async resgisterUser(@Body() date: UserDto) {
-    await this.userService.registerUser(date);
+    const user = await this.userService.registerUser(date);
+
+    if (!user.confirmationToken) {
+      throw new InternalServerErrorException('No se pudo generar el token de confirmación.');
+    }
+
+    await this.emailService.sendConfirmationEmail(user, user.confirmationToken);
     return {
       message: 'Usuario creado correctamente',
       status: 201,
