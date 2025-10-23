@@ -7,8 +7,8 @@ import {
   BadRequestException,
   NotFoundException,
 } from '@nestjs/common';
-import { UserEntity } from 'src/user/entity/user.entity';
 
+import { UserEntity } from '../user/entity/user.entity';
 import { GoogleAuthDto } from './dto/google-auth.dto';
 import { AuthDto } from './dto/auth.dto';
 
@@ -22,18 +22,21 @@ export class AuthService {
   async login(data: AuthDto) {
     const user = await this.userService.search_email(data.email);
 
-    if (user && !user.isConfirmed) {
+    if (!user || !user.password) {
+      // Si el usuario no existe o no tiene contraseña (p.ej. registro con Google)
+      throw new UnauthorizedException('Credenciales incorrectas');
+    }
+
+    const isPasswordValid = await bcrypt.compare(data.password, user.password);
+
+    if (!isPasswordValid) {
+      throw new UnauthorizedException('Credenciales incorrectas');
+    }
+
+    if (!user.isConfirmed) {
       throw new UnauthorizedException(
         'Por favor, confirma tu correo electrónico para iniciar sesión.',
       );
-    }
-
-    if (
-      !user ||
-      !user.password ||
-      !(await bcrypt.compare(data.password, user.password))
-    ) {
-      throw new UnauthorizedException('Credenciales incorrectas ');
     }
 
     return this.generateTokenAndUserResponse(user);
@@ -53,7 +56,7 @@ export class AuthService {
       newUser.email = googleUser.email;
       newUser.name = googleUser.name;
       newUser.lastname = googleUser.lastname;
-      newUser.isConfirmed = true; // Los usuarios de Google se confirman automáticamente
+      newUser.isConfirmed = true;
       user = await this.userService.userRepository.save(newUser);
     }
 
@@ -63,7 +66,7 @@ export class AuthService {
   private generateTokenAndUserResponse(user: UserEntity) {
     const payload = { sub: user.uuid_user, email: user.email };
     const token = this.jwtService.sign(payload);
-    const { password, ...userWithoutPassword } = user;
+    const { password: _password, ...userWithoutPassword } = user;
 
     return { token, user: userWithoutPassword };
   }
