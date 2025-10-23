@@ -7,7 +7,6 @@ import { AuthService } from '../src/auth/auth.service';
 import { UserService } from '../src/user/user.service';
 import { UserEntity } from '../src/user/entity/user.entity';
 
-// Mock de las dependencias
 jest.mock('bcrypt');
 
 describe('AuthService', () => {
@@ -17,7 +16,7 @@ describe('AuthService', () => {
 
   const mockUserService = {
     search_email: jest.fn(),
-    userRepository: { save: jest.fn() }, // Mock para otros métodos
+    userRepository: { save: jest.fn() },
   };
 
   const mockJwtService = {
