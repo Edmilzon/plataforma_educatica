@@ -1,9 +1,9 @@
 import NextAuth from "next-auth/next";
 import GoogleProvider from "next-auth/providers/google";
+import CredentialsProvider from "next-auth/providers/credentials";
 import axios from "axios";
+import { VALIDATE_EMAIL_USER, LOGIN_GOOGLE_USER, LOGIN_USER } from "@/app/api/api";
 
-// Imports de tu primer archivo
-import { VALIDATE_EMAIL_USER, LOGIN_GOOGLE_USER } from "@/app/api/api";
 type GoogleProfile = {
   email: string;
   name: string;
@@ -14,92 +14,116 @@ type GoogleProfile = {
 
 const HANDLER = NextAuth({
   providers: [
+    // -------------------
+    // LOGIN MANUAL (email + password)
+    // -------------------
+    CredentialsProvider({
+      name: "Credentials",
+      credentials: {
+        email: { label: "Correo", type: "email", placeholder: "correo@dominio.com" },
+        password: { label: "Contraseña", type: "password" },
+      },
+      async authorize(credentials) {
+        try {
+          if (!credentials?.email || !credentials?.password) return null;
+
+          // Usamos tu helper LOGIN_USER de api.ts
+          const data = await LOGIN_USER({
+            email: credentials.email,
+            password: credentials.password,
+          });
+
+          if (!data?.token || !data?.user) return null;
+
+          return {
+            id: data.user.uuid_user,
+            name: data.user.name,
+            email: data.user.email,
+            lastname: data.user.lastname,
+            role: data.user.role,
+            apiToken: data.token,
+            apiUser: data.user,
+          };
+        } catch (err) {
+          console.error("Error en login manual:", err);
+          return null;
+        }
+      },
+    }),
+
+    // -------------------
+    // LOGIN CON GOOGLE
+    // -------------------
     GoogleProvider({
-      // eslint-disable-next-line @typescript-eslint/naming-convention
       clientId: process.env.GOOGLE_CLIENT_ID!,
-      // eslint-disable-next-line @typescript-eslint/naming-convention
       clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
     }),
   ],
 
-  // Configuraciones añadidas de tu segundo archivo
   secret: process.env.NEXTAUTH_SECRET,
   session: { strategy: "jwt" },
 
   callbacks: {
-    async signIn({ user, profile }) {
-      if (!user.email) return false;
+    // -------------------
+    // SignIn callback
+    // -------------------
+    async signIn({ user, account, profile }) {
+      // Google login
+      if (account?.provider === "google") {
+        if (!user.email) return false;
 
-      try {
-        const exists = await VALIDATE_EMAIL_USER({ email: user.email });
+        try {
+          const exists = await VALIDATE_EMAIL_USER({ email: user.email });
 
-        if (!exists?.exists) {
-          console.log("Usuario no registrado, creando:", user.email);
-          // eslint-disable-next-line @typescript-eslint/naming-convention
-          const googleProfile = profile as GoogleProfile | undefined;
+          if (!exists?.exists) {
+            const googleProfile = profile as GoogleProfile | undefined;
+            if (!googleProfile) return false;
 
-          if (!googleProfile) {
-            console.error(
-              "No se recibió el perfil de Google para el registro.",
-            );
-            return false; // No se puede registrar sin perfil
-          }
-
-          try {
-            // Usamos la llamada axios de tu segundo archivo para registrar
-            await axios.post("http://localhost:5000/auth/google/signin", {
+            await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/auth/google/signin`, {
               email: googleProfile.email,
               name: googleProfile.given_name || googleProfile.name,
               lastname: googleProfile.family_name || "",
-              // Nota: Tu segundo archivo no enviaba 'picture',
-              // pero podrías añadirlo si tu backend lo acepta:
-              // picture: googleProfile.picture,
             });
-            console.log("Usuario creado exitosamente:", googleProfile.email);
-          } catch (error) {
-            console.error("Error al registrar con Google (axios post):", error);
-            return false; // Detener el login si falla el registro
           }
+
+          const login_data = await LOGIN_GOOGLE_USER(user.email);
+          (user as any).apiToken = login_data.token;
+          (user as any).apiUser = login_data.user;
+
+          return true;
+        } catch (error) {
+          console.error("Error en signIn con Google:", error);
+          return false;
         }
-
-        // 3. Loguear al usuario (existente o recién creado)
-        // (lógica de tu primer archivo)
-        const login_data = await LOGIN_GOOGLE_USER(user.email);
-
-        // Adjuntamos el token y datos del backend al objeto 'user'
-        // para que pasen al callback 'jwt'
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (user as any).apiToken = login_data.token;
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (user as any).apiUser = login_data.user;
-
-        return true; // Login exitoso
-      } catch (error) {
-        console.error("Error en el callback signIn:", error);
-        return false;
       }
+
+      // Credentials login → pasar sin cambios
+      return true;
     },
 
-    // Callback 'jwt' de tu primer archivo (sin cambios)
+    // -------------------
+    // JWT callback
+    // -------------------
     async jwt({ token, user }) {
       if (user) {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         token.apiToken = (user as any).apiToken;
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         token.apiUser = (user as any).apiUser;
       }
       return token;
     },
 
-    // Callback 'session' de tu primer archivo (sin cambios)
+    // -------------------
+    // Session callback
+    // -------------------
     async session({ session, token }) {
-      // Cast explícito para evitar el error de TS
       session.accessToken = token.apiToken as string | undefined;
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       session.userData = token.apiUser as Record<string, any> | undefined;
-
       return session;
     },
+  },
+
+  pages: {
+    signIn: "/user/login",
   },
 });
 
