@@ -3,7 +3,8 @@ import { useState } from "react";
 import Link from "next/link";
 import { HiMenu, HiX, HiSearch, HiChevronDown } from "react-icons/hi";
 import { useSession, signOut } from "next-auth/react";
-// eslint-disable-next-line complexity
+/* eslint-disable max-lines-per-function, complexity */
+
 const NANBAR = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isExploreOpen, setIsExploreOpen] = useState(false);

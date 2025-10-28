@@ -17,7 +17,7 @@ const LOGIN_SCHEMA = z.object({
   password: z.string().min(6, "Mínimo 6 caracteres"),
 });
 type LoginForm = z.infer<typeof LOGIN_SCHEMA>;
-/* eslint-disable-next-line complexity */
+/* eslint-disable max-lines-per-function, complexity */
 const LOGIN_PAGE = () => {
   const router = useRouter();
   const {

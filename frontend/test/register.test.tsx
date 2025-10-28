@@ -2,6 +2,7 @@ import { render, screen } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import React from "react";
 import { SessionProvider } from "next-auth/react";
+
 import REGISTER from "../src/app/user/register/page";
 
 jest.mock("next/navigation", () => ({

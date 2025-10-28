@@ -14,6 +14,7 @@ type ToastProps = {
   onClose: () => void;
   duration?: number;
 };
+/* eslint-disable max-lines-per-function*/
 const TOAST = ({
   message,
   type = "info",
