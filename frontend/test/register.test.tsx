@@ -20,10 +20,13 @@ jest.mock("next/image", () => ({
 }));
 
 import REGISTER from "../src/app/user/register/page";
-
+import { SessionProvider } from "next-auth/react";
 describe("REGISTER component", () => {
   it("renderiza los campos del formulario", () => {
-    render(<REGISTER />);
+    render(
+    <SessionProvider session={null}>
+     <REGISTER /> 
+    </SessionProvider>);
     expect(screen.getByText("Crea tu cuenta para empezar")).toBeInTheDocument();
     expect(screen.getByLabelText(/Nombre/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/Apellidos/i)).toBeInTheDocument();
