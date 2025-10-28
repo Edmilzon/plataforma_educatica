@@ -58,7 +58,8 @@ const eslintConfig = [
           leadingUnderscore: "allow",
           trailingUnderscore: "allow",
           custom: {
-            regex: "^(?:[a-z]+(?:[A-Z][a-zA-Z0-9]*)*|[a-z]+(?:_[a-z0-9]+)*|[A-Z][a-zA-Z0-9]*)$",
+            regex:
+              "^(?:[a-z]+(?:[A-Z][a-zA-Z0-9]*)*|[a-z]+(?:_[a-z0-9]+)*|[A-Z][a-zA-Z0-9]*)$",
             match: true,
           },
         },

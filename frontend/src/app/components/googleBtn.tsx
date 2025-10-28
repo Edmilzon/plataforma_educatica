@@ -4,7 +4,6 @@ import { FcGoogle } from "react-icons/fc";
 
 const BUTTON_BTN = () => {
   const HandleClick = async () => {
-    // eslint-disable-next-line @typescript-eslint/naming-convention
     signIn("google", { callbackUrl: "/user/home" });
   };
   return (

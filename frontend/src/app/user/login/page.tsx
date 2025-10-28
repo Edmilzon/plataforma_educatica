@@ -7,9 +7,10 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { LuEye, LuEyeClosed } from "react-icons/lu";
+import { signIn } from "next-auth/react";
 
 //import { FcGoogle } from "react-icons/fc";
-import { LOGIN_USER } from "@/app/api/api";
+//import { LOGIN_USER } from "@/app/api/api";
 import GoogleBtn from "@/app/components/googleBtn";
 const LOGIN_SCHEMA = z.object({
   email: z.string().email("Correo inválido"),
@@ -37,22 +38,22 @@ const LOGIN_PAGE = () => {
   }, [router]);
 
   const on_submit = async (data: LoginForm) => {
-    try {
-      set_loading(true);
-      set_error("");
-      const response = await LOGIN_USER(data);
+    set_loading(true);
+    set_error("");
 
-      if (response?.token) {
-        localStorage.setItem("token", response.token);
-        localStorage.setItem("user", JSON.stringify(response.login));
-        router.push("/user/home");
-      }
-    } catch (error: unknown) {
-      set_error("Usuario o email no registrado");
-      console.log(error);
-    } finally {
-      set_loading(false);
+    const result = await signIn("credentials", {
+      redirect: false,
+      email: data.email,
+      password: data.password,
+    });
+
+    if (result?.error) {
+      set_error("Usuario o contraseña incorrectos");
+    } else {
+      window.location.href = "/user/home";
     }
+
+    set_loading(false);
   };
 
   return (

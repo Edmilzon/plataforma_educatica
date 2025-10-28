@@ -302,7 +302,6 @@ const REGISTER = () => {
           <button
             className="px-10 border rounded-lg py-2 flex items-center justify-center gap-2 hover:bg-gray-100 transition transform hover:scale-105 shadow-sm"
             type="button"
-            // eslint-disable-next-line @typescript-eslint/naming-convention
             onClick={() => signIn("google", { callbackUrl: "/user/home" })}
           >
             <FcGoogle />

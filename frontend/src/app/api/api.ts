@@ -15,6 +15,7 @@ type LoginDataType = {
 };
 
 type LoginResponseType = {
+  user: any;
   message: string;
   status: number;
   token: string;

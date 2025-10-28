@@ -1,32 +1,83 @@
-{
-  /*"use client";
-import { AiOutlineCloseCircle } from "react-icons/ai";
+"use client";
+import { useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import {
+  AiOutlineCheckCircle,
+  AiOutlineInfoCircle,
+  AiOutlineWarning,
+  AiOutlineCloseCircle,
+} from "react-icons/ai";
 
-type ModalErrorProps = {
-  isOpen: boolean;
-  onClose: () => void;
+type ToastProps = {
   message: string;
+  type?: "error" | "success" | "warning" | "info";
+  onClose: () => void;
+  duration?: number;
 };
 
-const ModalError = ({ isOpen, onClose, message }: ModalErrorProps) => {
-  if (!isOpen) return null;
+export default function Toast({
+  message,
+  type = "info",
+  onClose,
+  duration = 8000,
+}: ToastProps) {
+  // Auto-cierre después del tiempo definido
+  useEffect(() => {
+    const timer = setTimeout(onClose, duration);
+    return () => clearTimeout(timer);
+  }, [onClose, duration]);
+
+  // Estilos según el tipo
+  const styles = {
+    error: {
+      icon: <AiOutlineCloseCircle className="text-red-500 w-6 h-6" />,
+      bg: "bg-red-50 border-red-300",
+      border: "border-red-300",
+    },
+    success: {
+      icon: <AiOutlineCheckCircle className="text-green-500 w-6 h-6" />,
+      bg: "bg-green-50 border-green-200",
+      border: "border-green-200",
+    },
+    warning: {
+      icon: <AiOutlineWarning className="text-yellow-500 w-6 h-6" />,
+      bg: "bg-yellow-50 border-yellow-200",
+      border: "border-yellow-200",
+    },
+    info: {
+      icon: <AiOutlineInfoCircle className="text-red-500 w-6 h-6" />,
+      bg: "bg-blue-50 border-blue-200",
+      border: "border-blue-200",
+    },
+  };
+
+  const { icon, bg, border } = styles[type];
 
   return (
-    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 animate-fadeIn">
-      <div className="bg-white/10 border border-white/20 rounded-2xl shadow-2xl p-6 max-w-sm w-full text-center text-white animate-scaleUp">
-        <AiOutlineCloseCircle className="text-red-400 w-14 h-14 mx-auto mb-3" />
-        <h2 className="text-xl font-semibold mb-2">¡Error!</h2>
-        <p className="text-gray-200 mb-4">{message}</p>
+    <AnimatePresence>
+      <motion.div
+        animate={{ opacity: 1, x: 0 }}
+        className={`fixed top-5 right-5 z-50 ${bg} ${border} shadow-lg rounded-xl p-4 flex items-center space-x-3 text-sm w-[90%] sm:w-[22rem] md:w-[24rem] lg:w-[26rem]`}
+        exit={{ opacity: 0, x: 100 }}
+        initial={{ opacity: 0, x: 100 }}
+        transition={{ type: "spring", stiffness: 250, damping: 20 }}
+      >
+        {/* Ícono */}
+        <div>{icon}</div>
+
+        {/* Mensaje */}
+        <p className="text-gray-800 font-medium flex-1 break-words">
+          {message}
+        </p>
+
+        {/* Botón de cierre */}
         <button
-          className="bg-red-500 hover:bg-red-600 px-4 py-2 rounded-full transition-colors"
+          className="text-gray-400 hover:text-gray-600 transition-colors text-lg"
           onClick={onClose}
         >
-          Cerrar
+          ×
         </button>
-      </div>
-    </div>
+      </motion.div>
+    </AnimatePresence>
   );
-};
-
-export default ModalError;  */
 }

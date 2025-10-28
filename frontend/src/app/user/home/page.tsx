@@ -15,7 +15,7 @@ const HOME = () => {
         token: session.accessToken,
         user: session.userData,
       });
-      router.push("/");
+      router.push("/dashboard");
     }
   }, [session, router]);
 
