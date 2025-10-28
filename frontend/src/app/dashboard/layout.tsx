@@ -1,10 +1,11 @@
 import Navbar from "../components/Navbar";
-
-export default function DashboardLayout({ children }: { children: React.ReactNode }) {
+const DASHBOARDLAYOUT = ({ children }: { children: React.ReactNode }) => {
   return (
     <>
       <Navbar />
       {children}
     </>
-  )
-}
+  );
+};
+
+export default DASHBOARDLAYOUT;

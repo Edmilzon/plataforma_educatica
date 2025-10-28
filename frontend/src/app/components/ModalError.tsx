@@ -14,13 +14,12 @@ type ToastProps = {
   onClose: () => void;
   duration?: number;
 };
-
-export default function Toast({
+const TOAST = ({
   message,
   type = "info",
   onClose,
   duration = 8000,
-}: ToastProps) {
+}: ToastProps) => {
   // Auto-cierre después del tiempo definido
   useEffect(() => {
     const timer = setTimeout(onClose, duration);
@@ -80,4 +79,5 @@ export default function Toast({
       </motion.div>
     </AnimatePresence>
   );
-}
+};
+export default TOAST;
