@@ -3,11 +3,12 @@ import { useState } from "react";
 import Link from "next/link";
 import { HiMenu, HiX, HiSearch, HiChevronDown } from "react-icons/hi";
 import { useSession, signOut } from "next-auth/react";
-
+// eslint-disable-next-line complexity
 const NANBAR = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isExploreOpen, setIsExploreOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { data: session, status } = useSession();
   const isAuthenticated = status === "authenticated";
 

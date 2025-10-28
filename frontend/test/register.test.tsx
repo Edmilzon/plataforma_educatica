@@ -1,7 +1,8 @@
 import { render, screen } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import React from "react";
-import { SessionProvider } from "next-auth/react"; // <- Importar
+import { SessionProvider } from "next-auth/react";
+import REGISTER from "../src/app/user/register/page";
 
 jest.mock("next/navigation", () => ({
   useRouter: () => ({
@@ -19,8 +20,6 @@ jest.mock("next/image", () => ({
     });
   },
 }));
-
-import REGISTER from "../src/app/user/register/page";
 
 describe("REGISTER component", () => {
   it("renderiza los campos del formulario", () => {

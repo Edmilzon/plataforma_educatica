@@ -29,6 +29,7 @@ const HANDLER = NextAuth({
         },
         password: { label: "Contraseña", type: "password" },
       },
+      // eslint-disable-next-line complexity
       async authorize(credentials) {
         try {
           if (!credentials?.email || !credentials?.password) return null;
@@ -64,6 +65,7 @@ const HANDLER = NextAuth({
   session: { strategy: "jwt" },
 
   callbacks: {
+    // eslint-disable-next-line complexity
     async signIn({ user, account, profile }) {
       if (account?.provider === "google") {
         if (!user.email) return false;
@@ -86,7 +88,9 @@ const HANDLER = NextAuth({
           }
 
           const login_data = await LOGIN_GOOGLE_USER(user.email);
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           (user as any).apiToken = login_data.token;
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           (user as any).apiUser = login_data.user;
 
           return true;
@@ -99,13 +103,17 @@ const HANDLER = NextAuth({
     },
     async jwt({ token, user }) {
       if (user) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         token.apiToken = (user as any).apiToken;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         token.apiUser = (user as any).apiUser;
       }
       return token;
     },
+
     async session({ session, token }) {
       session.accessToken = token.apiToken as string | undefined;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       session.userData = token.apiUser as Record<string, any> | undefined;
       return session;
     },
