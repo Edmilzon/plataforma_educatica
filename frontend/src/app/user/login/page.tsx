@@ -79,13 +79,17 @@ const LOGIN_PAGE = () => {
 
           <form className="space-y-4" onSubmit={handle_submit(on_submit)}>
             <div>
-              <label className="block text-sm text-[#190E5D] font-bold">
+              <label
+                className="block text-sm text-[#190E5D] font-bold"
+                htmlFor="email"
+              >
                 Correo
               </label>
               <input
                 type="email"
                 {...register("email")}
                 className="mt-1 w-full rounded-lg border px-3 py-2 text-black placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#306998]"
+                id="email"
                 placeholder="ejemplo@correo.com"
               />
               {errors.email && (
@@ -94,7 +98,10 @@ const LOGIN_PAGE = () => {
             </div>
 
             <div>
-              <label className="block text-sm text-[#190E5D] font-bold">
+              <label
+                className="block text-sm text-[#190E5D] font-bold"
+                htmlFor="password"
+              >
                 Contraseña
               </label>
               <div className="relative">
@@ -102,9 +109,11 @@ const LOGIN_PAGE = () => {
                   type={show_password ? "text" : "password"}
                   {...register("password")}
                   className="mt-1 w-full rounded-lg border px-3 py-2 text-black placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#306998]"
+                  id="password"
                   placeholder="********"
                 />
                 <button
+                  aria-label="Mostrar contraseña"
                   className="absolute inset-y-0 right-3 flex items-center text-gray-500 hover:text-black cursor-pointer"
                   type="button"
                   onClick={() => set_show_password(!show_password)}

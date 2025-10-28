@@ -9,7 +9,7 @@
     "lint": "eslint",
     "test": "jest",
     "test:watch": "jest --watch",
-    "test:cov": "jest --coverage"
+    "test:cov": "jest --coverage --verbose"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
