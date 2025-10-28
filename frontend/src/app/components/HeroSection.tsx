@@ -21,7 +21,7 @@ const HEROSECTION = () => {
 
   if (!user) return <p>No hay usuario logueado</p>;
   return (
-    <section className="bg-yellow-200 w-full flex flex-col md:flex-row items-center justify-between px-6 md:px-20 py-12 rounded-xl shadow-sm">
+    <section className="bg-[#b8e1e8] w-full flex flex-col md:flex-row items-center justify-between px-6 md:px-20 py-12 rounded-xl shadow-sm">
       <div className="max-w-md space-y-4">
         <h1 className="text-3xl md:text-4xl font-bold text-gray-900">
           ¡Te hemos echado de menos, {user.name} {user.lastname}!
@@ -30,7 +30,7 @@ const HEROSECTION = () => {
           Retoma el ritmo y alcanza tus metas en Python. Dedica solo 5 a 10
           minutos al día para seguir aprendiendo.
         </p>
-        <button className="bg-black text-white px-6 py-3 rounded-full hover:bg-gray-800 transition">
+        <button className="bg-black text-white px-6 py-3 rounded-full hover:bg-gray-800 transition cursor-pointer">
           Retomar curso
         </button>
       </div>

@@ -49,7 +49,7 @@ const REGISTER_SCHEMA = z
   })
   .refine((data) => data.password === data.confirm_password, {
     message: "Las contraseñas no coinciden",
-    path: ["confirmPassword"],
+    path: ["confirm_password"],
   });
 
 type RegisterForm = z.infer<typeof REGISTER_SCHEMA>;
@@ -300,7 +300,7 @@ const REGISTER = () => {
 
           <div className="flex justify-center mt-2 mx-10">
             <button
-              className="w-full rounded-lg bg-[#65a30d] px-4 py-2 text-white font-semibold hover:from-lime-600 transition transform hover:scale-105 shadow-md cursor-pointer"
+              className="w-full rounded-lg bg-[#0098af] hover:bg-[#19a2b6] px-4 py-2 text-white font-semibold  transition transform hover:scale-105 shadow-md cursor-pointer"
               disabled={loading}
               type="submit"
             >
@@ -313,7 +313,7 @@ const REGISTER = () => {
             {" "}
             ¿Ya tienes cuenta?{" "}
             <button
-              className="font-bold text-[#190E5D] underline hover:text-lime-500"
+              className="font-bold text-[#190E5D] underline hover:text-[#19a2b6]"
               onClick={() => router.push("/user/login")}
             >
               Inicia sesión

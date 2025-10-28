@@ -90,7 +90,7 @@ const NANBAR = () => {
                 Cursos
               </Link>
               <button
-                className="bg-red-500 hover:bg-red-600 px-4 py-2 rounded-full text-white transition"
+                className="bg-[#d40d48] hover:bg-[#ff005a] px-4 py-2 rounded-full text-white transition cursor-pointer"
                 onClick={() => {
                   signOut({ callbackUrl: "/" });
                   sessionStorage.clear();
@@ -108,7 +108,7 @@ const NANBAR = () => {
                 Registrarse
               </Link>
               <Link
-                className="bg-green-500 hover:bg-green-600 px-4 py-2 rounded-full text-white transition"
+                className="bg-[#19a2b6] hover:bg-[#19a2b6] px-4 py-2 rounded-full text-white transition"
                 href="/user/login"
               >
                 Iniciar sesión
