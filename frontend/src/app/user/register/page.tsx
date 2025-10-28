@@ -10,6 +10,7 @@ import Image from "next/image";
 import { signIn } from "next-auth/react";
 import { useSession } from "next-auth/react";
 
+import Toast from "@/app/components/ModalError";
 import { REGISTER_USER } from "@/app/api/api";
 
 const REGISTER_SCHEMA = z
@@ -60,6 +61,23 @@ const REGISTER = () => {
   const [show_password, set_show_password] = useState(false);
   const [show_confirm_password, set_show_confirm_password] = useState(false);
   const router = useRouter();
+  const [loading, set_loading] = useState(false);
+
+  const [toast, set_toast] = useState<{
+    message: string;
+    type: "error" | "success" | "warning" | "info";
+    visible: boolean;
+  }>({
+    message: "",
+    type: "info",
+    visible: false,
+  });
+  const show_toast = (
+    message: string,
+    type: "error" | "success" | "warning" | "info",
+  ) => {
+    set_toast({ message, type, visible: true });
+  };
 
   const { data: session, status } = useSession();
   useEffect(() => {
@@ -79,10 +97,13 @@ const REGISTER = () => {
   });
 
   const on_submit = async (data: RegisterForm) => {
+    set_loading(true); // ✅ deshabilita el botón mientras se envía
     try {
       await send_user_data(data);
     } catch (error) {
       handle_error(error);
+    } finally {
+      set_loading(false); // ✅ se habilita nuevamente
     }
   };
 
@@ -90,17 +111,19 @@ const REGISTER = () => {
     const { ...user_data } = data;
     const res = await REGISTER_USER(user_data);
     console.log("Respuesta del servidor:", res);
-    alert("Registro exitoso. Por favor, inicia sesión.");
-    router.push("/user/login");
+    show_toast(
+      "Registro exitoso. Se envio un correo de verificacion",
+      "success",
+    );
+    setTimeout(() => router.push("/user/login"), 2000);
   };
 
   const handle_error = (error: unknown) => {
     if (error instanceof Error) {
-      alert(error.message);
+      show_toast(error.message, "error");
     } else {
-      alert("Error al registrar usuario");
+      show_toast("Error al registrar usuario", "error");
     }
-    console.error(error);
   };
 
   return (
@@ -276,8 +299,12 @@ const REGISTER = () => {
           </div>
 
           <div className="flex justify-center mt-2 mx-10">
-            <button className="w-full rounded-lg bg-[#65a30d] px-4 py-2 text-white font-semibold hover:from-lime-600 transition transform hover:scale-105 shadow-md cursor-pointer">
-              Crear cuenta
+            <button
+              className="w-full rounded-lg bg-[#65a30d] px-4 py-2 text-white font-semibold hover:from-lime-600 transition transform hover:scale-105 shadow-md cursor-pointer"
+              disabled={loading}
+              type="submit"
+            >
+              {loading ? "Registrando..." : "Crear cuenta"}
             </button>
           </div>
         </form>
@@ -311,6 +338,13 @@ const REGISTER = () => {
           </button>
         </div>
       </div>
+      {toast.visible && (
+        <Toast
+          message={toast.message}
+          type={toast.type}
+          onClose={() => set_toast({ ...toast, visible: false })}
+        />
+      )}
     </div>
   );
 };

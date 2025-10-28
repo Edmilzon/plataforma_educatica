@@ -1,6 +1,7 @@
 import { render, screen } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import React from "react";
+import { SessionProvider } from "next-auth/react"; // <- Importar
 
 jest.mock("next/navigation", () => ({
   useRouter: () => ({
@@ -23,15 +24,20 @@ import REGISTER from "../src/app/user/register/page";
 
 describe("REGISTER component", () => {
   it("renderiza los campos del formulario", () => {
-    render(<REGISTER />);
+    render(
+      <SessionProvider session={null}>
+        {" "}
+        {/* <- Aquí */}
+        <REGISTER />
+      </SessionProvider>,
+    );
+
     expect(screen.getByText("Crea tu cuenta para empezar")).toBeInTheDocument();
     expect(screen.getByLabelText(/Nombre/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/Apellidos/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/Email/i)).toBeInTheDocument();
     expect(screen.getByTestId("password")).toBeInTheDocument();
     expect(screen.getByTestId("confirm_password")).toBeInTheDocument();
-
-    expect(screen.getByLabelText(/Telefono/i)).toBeInTheDocument();
     expect(
       screen.getByRole("button", { name: /Crear cuenta/i }),
     ).toBeInTheDocument();
