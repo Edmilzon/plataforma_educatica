@@ -54,11 +54,12 @@ const eslintConfig = [
             "objectLiteralProperty",
             "classProperty",
           ],
-          format: ["snake_case", "PascalCase"],
+          format: ["camelCase", "snake_case", "PascalCase"],
           leadingUnderscore: "allow",
           trailingUnderscore: "allow",
           custom: {
-            regex: "^[a-z]+(_[a-z]+)*$|^[A-Z][a-zA-Z]*$",
+            regex:
+              "^(?:[a-z]+(?:[A-Z][a-zA-Z0-9]*)*|[a-z]+(?:_[a-z0-9]+)*|[A-Z][a-zA-Z0-9]*)$",
             match: true,
           },
         },

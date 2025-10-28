@@ -51,11 +51,11 @@ export default tseslint.config(
         },
         {
           selector: ['variable', 'function', 'parameter', 'objectLiteralProperty', 'classProperty'],
-          format: ['snake_case', 'PascalCase'],
+          format: ['camelCase', 'snake_case', 'PascalCase'],
           leadingUnderscore: 'allow',
           trailingUnderscore: 'allow',
           custom: {
-            regex: '^[a-z]+(_[a-z]+)*$|^[A-Z][a-zA-Z]*$',
+            regex: '^(?:[a-z]+(?:[A-Z][a-zA-Z0-9]*)*|[a-z]+(?:_[a-z0-9]+)*|[A-Z][a-zA-Z0-9]*)$',
             match: true,
           },
         },
@@ -90,5 +90,16 @@ export default tseslint.config(
         },
       ],
     },
-  }
+  },
+  {
+    files: ['**/*.spec.ts'],
+    rules: {
+      // Desactivar reglas que no son críticas para los tests
+      'max-lines-per-function': 'off',
+      '@typescript-eslint/unbound-method': 'off',
+      '@typescript-eslint/no-unsafe-assignment': 'off',
+      '@typescript-eslint/no-unsafe-call': 'off',
+      '@typescript-eslint/no-unsafe-member-access': 'off',
+    },
+  },
 );

@@ -7,7 +7,6 @@ type UserDataType = {
   lastname: string;
   email: string;
   password: string;
-  phone: string;
 };
 
 type LoginDataType = {
@@ -16,6 +15,8 @@ type LoginDataType = {
 };
 
 type LoginResponseType = {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  user: any;
   message: string;
   status: number;
   token: string;
@@ -24,7 +25,6 @@ type LoginResponseType = {
     email: string;
     name: string;
     lastname: string;
-    phone: string;
   };
 };
 
@@ -49,10 +49,32 @@ export const LOGIN_USER = async (
   login_data: LoginDataType,
 ): Promise<LoginResponseType> => {
   try {
-    const response = await axios.post(`${API_URL}/user/login`, login_data);
+    const response = await axios.post(`${API_URL}/auth/login`, login_data);
     return response.data as LoginResponseType;
   } catch (error) {
     HANDLE_AXIOS_ERROR(error);
     return error as never;
+  }
+};
+
+export const VALIDATE_EMAIL_USER = async (email_data: { email: string }) => {
+  try {
+    const response = await axios.post(
+      `${API_URL}/user/validate-email`,
+      email_data,
+    );
+    return response.data;
+  } catch (error) {
+    HANDLE_AXIOS_ERROR(error);
+  }
+};
+export const LOGIN_GOOGLE_USER = async (email: string) => {
+  try {
+    const response = await axios.post(`${API_URL}/auth/google/signin`, {
+      email,
+    });
+    return response.data;
+  } catch (error) {
+    HANDLE_AXIOS_ERROR(error);
   }
 };

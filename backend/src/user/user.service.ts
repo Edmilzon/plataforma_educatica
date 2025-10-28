@@ -1,12 +1,8 @@
 import { Repository } from 'typeorm';
-import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
-import {
-  BadRequestException,
-  Injectable,
-  UnauthorizedException,
-} from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
+import * as crypto from 'crypto';
 
 import { UserDto } from './dto/user.dto';
 import { UserEntity } from './entity/user.entity';
@@ -15,13 +11,12 @@ import { UserEntity } from './entity/user.entity';
 export class UserService {
   constructor(
     @InjectRepository(UserEntity)
-    private readonly userRepository: Repository<UserEntity>,
-    private readonly jwtService: JwtService,
+    public readonly userRepository: Repository<UserEntity>,
   ) {}
 
   //Register user
-  async createUser(date: UserDto): Promise<UserEntity> {
-    const validate = await this.validateExists(date.email, date.phone);
+  async registerUser(date: UserDto): Promise<UserEntity> {
+    const validate = await this.validateExists(date.email);
     if (validate)
       throw new BadRequestException('El correo o telefono ya existe');
 
@@ -30,40 +25,29 @@ export class UserService {
     new_user.password = await bcrypt.hash(date.password, 10);
     new_user.name = date.name;
     new_user.lastname = date.lastname;
-    new_user.phone = date.phone;
-    new_user.role = date.rol;
+    new_user.role = date.role;
+    new_user.confirmationToken = crypto.randomBytes(32).toString('hex');
     return this.userRepository.save(new_user);
   }
 
-  async validateExists(mail: string, phon: string): Promise<boolean> {
+  async validateExists(mail: string): Promise<boolean> {
     const validate = await this.userRepository.exists({
-      where: [{ email: mail }, { phone: phon }],
+      where: [{ email: mail }],
     });
     return validate;
   }
 
-  //Login user
-  async loginUser(date: UserDto) {
+  async search_email(email: string): Promise<UserEntity | undefined> {
+    const user = await this.userRepository.findOne({ where: { email } });
+    return user ?? undefined;
+  }
+
+  async findByConfirmationToken(
+    token: string,
+  ): Promise<UserEntity | undefined> {
     const user = await this.userRepository.findOne({
-      where: { email: date.email },
+      where: { confirmationToken: token },
     });
-    if (!user) {
-      throw new UnauthorizedException('Credenciales incorrectas');
-    }
-    const validate_password = await bcrypt.compare(
-      date.password,
-      user.password,
-    );
-    if (!validate_password) {
-      throw new UnauthorizedException('Credenciales incorrectas');
-    }
-
-    const payload = { sub: user.uuid_user, email: user.email };
-    const token = this.jwtService.sign(payload);
-
-    return {
-      token,
-      user,
-    };
+    return user ?? undefined;
   }
 }

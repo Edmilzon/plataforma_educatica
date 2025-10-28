@@ -1,13 +1,16 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { LuEye, LuEyeClosed } from "react-icons/lu";
-// import { FcGoogle } from "react-icons/fc";
+import { LuEye, LuEyeClosed, LuCircleArrowLeft } from "react-icons/lu";
+import { FcGoogle } from "react-icons/fc";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
+import { signIn } from "next-auth/react";
+import { useSession } from "next-auth/react";
 
+import Toast from "@/app/components/ModalError";
 import { REGISTER_USER } from "@/app/api/api";
 
 const REGISTER_SCHEMA = z
@@ -43,13 +46,6 @@ const REGISTER_SCHEMA = z
         "Debe contener al menos un número o un caracter especial",
       ),
     confirm_password: z.string().nonempty("El campo es obligatorio"),
-    phone: z
-      .string()
-      .nonempty("El campo es obligatorio")
-      .regex(
-        /^[67]\d{7}$/,
-        "El número debe empezar con 6 o 7 y tener 8 dígitos",
-      ),
   })
   .refine((data) => data.password === data.confirm_password, {
     message: "Las contraseñas no coinciden",
@@ -59,11 +55,37 @@ const REGISTER_SCHEMA = z
 type RegisterForm = z.infer<typeof REGISTER_SCHEMA>;
 
 /* eslint-disable max-lines-per-function, complexity */
+
 const REGISTER = () => {
   const img = "/img/curso_python.png";
   const [show_password, set_show_password] = useState(false);
   const [show_confirm_password, set_show_confirm_password] = useState(false);
   const router = useRouter();
+  const [loading, set_loading] = useState(false);
+
+  const [toast, set_toast] = useState<{
+    message: string;
+    type: "error" | "success" | "warning" | "info";
+    visible: boolean;
+  }>({
+    message: "",
+    type: "info",
+    visible: false,
+  });
+  const show_toast = (
+    message: string,
+    type: "error" | "success" | "warning" | "info",
+  ) => {
+    set_toast({ message, type, visible: true });
+  };
+
+  const { data: session, status } = useSession();
+  useEffect(() => {
+    if (status === "authenticated" && session?.user) {
+      sessionStorage.setItem("user", JSON.stringify(session.user));
+      router.push("/user/home");
+    }
+  }, [session, status, router]);
 
   const {
     register,
@@ -75,10 +97,13 @@ const REGISTER = () => {
   });
 
   const on_submit = async (data: RegisterForm) => {
+    set_loading(true); // ✅ deshabilita el botón mientras se envía
     try {
       await send_user_data(data);
     } catch (error) {
       handle_error(error);
+    } finally {
+      set_loading(false); // ✅ se habilita nuevamente
     }
   };
 
@@ -86,17 +111,19 @@ const REGISTER = () => {
     const { ...user_data } = data;
     const res = await REGISTER_USER(user_data);
     console.log("Respuesta del servidor:", res);
-    alert("Registro exitoso. Por favor, inicia sesión.");
-    router.push("/user/login");
+    show_toast(
+      "Registro exitoso. Se envio un correo de verificacion",
+      "success",
+    );
+    setTimeout(() => router.push("/user/login"), 2000);
   };
 
   const handle_error = (error: unknown) => {
     if (error instanceof Error) {
-      alert(error.message);
+      show_toast(error.message, "error");
     } else {
-      alert("Error al registrar usuario");
+      show_toast("Error al registrar usuario", "error");
     }
-    console.error(error);
   };
 
   return (
@@ -114,15 +141,21 @@ const REGISTER = () => {
       {/* lado der */}
       <div className="bg-white min-h-screen lg:p-20 md:p-16 sm:p-10 w-full lg:w-1/2 overflow-y-auto">
         <form onSubmit={handle_submit(on_submit)}>
-          <h2 className="text-[#306998] text-3xl font-bold mb-6 mt-5">
+          <button
+            className="text-[#306998] text-3xl font-bold mx-4 "
+            onClick={() => router.push("/user/login")}
+          >
+            <LuCircleArrowLeft />
+          </button>
+          <h2 className="text-[#306998] text-3xl font-bold mb-6 mt-5 mx-4">
             Regístrate
           </h2>
-          <p className="text-gray-600">Crea tu cuenta para empezar</p>
+          <p className="text-gray-600 mx-4">Crea tu cuenta para empezar</p>
           {/* nombre y apellido */}
           <div className="mb-4 md:justify-between m-4 grid grid-cols-2 gap-4">
             <div className="mb-4 md:mr-2 md:mb-0">
               <label
-                className="text-[#190E5D] font-bold block text-sm"
+                className="text-[#190E5D] font-bold block text-sm mb-1"
                 htmlFor="name"
               >
                 Nombre <span className="text-red-500"> *</span>
@@ -145,7 +178,7 @@ const REGISTER = () => {
 
             <div className="md:ml-2">
               <label
-                className="text-[#190E5D] font-bold block text-sm"
+                className="text-[#190E5D] font-bold block text-sm mb-1"
                 htmlFor="lastname"
               >
                 Apellidos <span className="text-red-500"> *</span>
@@ -189,7 +222,7 @@ const REGISTER = () => {
           </div>
           {/* contrasenia y confirmar contrasenia */}
           <div className="mb-4 md:justify-between m-4 grid grid-cols-2 gap-4">
-            <div className="md:mr-2 md:mb-0">
+            <div className="mb-4 md:mr-2 md:mb-0">
               <label
                 className="text-[#190E5D] font-bold  block text-sm mb-1"
                 htmlFor="password"
@@ -222,7 +255,7 @@ const REGISTER = () => {
                   {errors.password.message}
                 </p>
               ) : (
-                <p className="h-4"></p>
+                <p className=""></p>
               )}
             </div>
             <div className="md:ml-2">
@@ -260,35 +293,18 @@ const REGISTER = () => {
                   {errors.confirm_password.message}
                 </p>
               ) : (
-                <p className="h-4"></p>
+                <p></p>
               )}
             </div>
           </div>
-          {/* telefono */}
-          <div className="mb-4 mx-4">
-            <label
-              className="block text-[#190E5D] font-bold mb-1"
-              htmlFor="phone"
-            >
-              Telefono <span className="text-red-500"> *</span>
-            </label>
-            <input
-              id="phone"
-              type="text"
-              {...register("phone")}
-              className="mt-1 w-full rounded-lg border px-3 py-2 text-black placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#306998]"
-              placeholder="Numero de celular"
-            />
-            {errors.phone ? (
-              <p className="text-xs text-red-500 h-4">{errors.phone.message}</p>
-            ) : (
-              <p className="h-4"></p>
-            )}
-          </div>
 
           <div className="flex justify-center mt-2 mx-10">
-            <button className="w-full justify-center flex items-center px-4 py-2 bg-gradient-to-r from-lime-600 via-lime-600 to-lime-600 text-white font-bold text-lg rounded-lg shadow-2xl hover:from-lime-600 hover:via-lime-600 hover:to-lime-600 focus:outline-none focus:ring-4 focus:ring-lime-100 focus:ring-opacity-70 active:bg-lime-600 active:shadow-inner transform hover:scale-110 transition duration-500 ease-in-out disabled:opacity-50 disabled:cursor-not-allowed ml-4">
-              Crear cuenta
+            <button
+              className="w-full rounded-lg bg-[#65a30d] px-4 py-2 text-white font-semibold hover:from-lime-600 transition transform hover:scale-105 shadow-md cursor-pointer"
+              disabled={loading}
+              type="submit"
+            >
+              {loading ? "Registrando..." : "Crear cuenta"}
             </button>
           </div>
         </form>
@@ -304,20 +320,31 @@ const REGISTER = () => {
             </button>
           </p>
         </div>
-        {/* <div className="flex justify-center items-center mb-4">
+        <div className="flex justify-center items-center mb-4">
           <hr className="w-16 border-gray-600" />
           <span className="px-3 text-gray-400">O</span>
           <hr className="w-16 border-gray-600" />
         </div>
         <div className="flex justify-center mt-2 mx-10">
-          <button className="px-10 border rounded-lg py-2 flex items-center justify-center gap-2 hover:bg-gray-100 transition transform hover:scale-105 shadow-sm">
+          <button
+            className="px-10 border rounded-lg py-2 flex items-center justify-center gap-2 hover:bg-gray-100 transition transform hover:scale-105 shadow-sm"
+            type="button"
+            onClick={() => signIn("google", { callbackUrl: "/user/home" })}
+          >
             <FcGoogle />
             <span className="text-black font-medium">
               Registrarse con Google
             </span>
           </button>
-        </div> */}
+        </div>
       </div>
+      {toast.visible && (
+        <Toast
+          message={toast.message}
+          type={toast.type}
+          onClose={() => set_toast({ ...toast, visible: false })}
+        />
+      )}
     </div>
   );
 };

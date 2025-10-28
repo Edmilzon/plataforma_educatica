@@ -17,9 +17,5 @@ export class UserDto {
   lastname: string;
 
   @IsString()
-  @MinLength(10)
-  phone: string;
-
-  @IsString()
-  rol: string;
+  role: string;
 }

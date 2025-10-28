@@ -1,30 +1,46 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  InternalServerErrorException,
+  Post,
+} from '@nestjs/common';
+import { EmailService } from 'src/email/email.service';
 
 import { UserService } from './user.service';
 import { UserDto } from './dto/user.dto';
 
 @Controller('user')
 export class UserController {
-  constructor(private readonly userService: UserService) {}
+  constructor(
+    private readonly userService: UserService,
+    private readonly emailService: EmailService,
+  ) {}
 
   @Post('register')
   async resgisterUser(@Body() date: UserDto) {
-    await this.userService.createUser(date);
+    const user = await this.userService.registerUser(date);
+
+    if (!user.confirmationToken) {
+      throw new InternalServerErrorException(
+        'No se pudo generar el token de confirmación.',
+      );
+    }
+
+    await this.emailService.sendConfirmationEmail(user, user.confirmationToken);
     return {
       message: 'Usuario creado correctamente',
       status: 201,
     };
   }
 
-  @Post('login')
-  async loginUser(@Body() date: UserDto) {
-    const login = await this.userService.loginUser(date);
-    const { password: _password, ...user_not_password } = login.user;
+  @Post('validate-email')
+  async validateEmail(@Body('email') email: string) {
+    const exists = await this.userService.validateExists(email);
     return {
-      message: 'Login exitoso',
-      status: 200,
-      token: login.token,
-      login: user_not_password,
+      exists,
+      message: exists
+        ? 'El correo ya esta registrado'
+        : 'El usuario no existe ',
     };
   }
 }

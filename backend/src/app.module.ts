@@ -5,6 +5,8 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { UserModule } from './user/user.module';
+import { AuthModule } from './auth/auth.module';
+import { EmailModule } from './email/email.module';
 
 @Module({
   imports: [
@@ -12,11 +14,13 @@ import { UserModule } from './user/user.module';
     TypeOrmModule.forRoot({
       type: 'postgres',
       url: process.env.DB_URL,
-      // eslint-disable-next-line @typescript-eslint/naming-convention
+
       autoLoadEntities: true,
       synchronize: true,
     }),
     UserModule,
+    AuthModule,
+    EmailModule,
   ],
   controllers: [AppController],
   providers: [AppService],
