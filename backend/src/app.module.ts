@@ -1,25 +1,33 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { DataSourceOptions } from 'typeorm';
 
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { UserModule } from './user/user.module';
-import { AuthModule } from './auth/auth.module';
 import { EmailModule } from './email/email.module';
+import { UserEntity } from './user/entity/user.entity';
+import { RoleEntity } from './user/entity/role.entity';
+import { RoleUserEntity } from './user/entity/role_user.entity';
+
+export const AppDataSourceOptions: DataSourceOptions = {
+  type: 'postgres',
+  url: process.env.DB_URL,
+  entities: [UserEntity, RoleEntity, RoleUserEntity],
+  synchronize: false,
+  migrations: [__dirname + '/user/entity/1716928800000-SeedRoles.ts'],
+  migrationsTableName: 'migrations_seeders', 
+};
 
 @Module({
   imports: [
     ConfigModule.forRoot(),
     TypeOrmModule.forRoot({
-      type: 'postgres',
-      url: process.env.DB_URL,
-
-      autoLoadEntities: true,
-      synchronize: true,
+      ...AppDataSourceOptions,
+      autoLoadEntities: true, 
     }),
     UserModule,
-    AuthModule,
     EmailModule,
   ],
   controllers: [AppController],

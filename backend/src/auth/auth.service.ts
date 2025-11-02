@@ -86,7 +86,7 @@ export class AuthService {
 
     return {
       message:
-        'Correo electrónico confirmado con éxito. Ya puedes iniciar sesión.',
+        'Correo electrónico confirmado con éxito',
     };
   }
 }

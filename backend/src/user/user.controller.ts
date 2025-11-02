@@ -2,10 +2,14 @@ import {
   Body,
   Controller,
   InternalServerErrorException,
+  Get,
   Post,
+  Req,
+  UseGuards,
 } from '@nestjs/common';
 import { EmailService } from 'src/email/email.service';
 
+import { AuthGuard } from '@nestjs/passport';
 import { UserService } from './user.service';
 import { UserDto } from './dto/user.dto';
 
@@ -42,5 +46,16 @@ export class UserController {
         ? 'El correo ya esta registrado'
         : 'El usuario no existe ',
     };
+  }
+
+  @Get('profile')
+  @UseGuards(AuthGuard('jwt'))
+  getProfile(@Req() req) {
+    return this.userService.getProfile(req.user.uuid_user);
+  }
+
+  @Get('all')
+  async getAllUsers() {
+    return this.userService.getusers();
   }
 }

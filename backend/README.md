@@ -102,5 +102,8 @@ npm run build
 
 npx eslint . --fix
 
+npm run migration:run
+
+
 #EJECUTA LOS TEST 
 export DB_URL='postgresql://neondb_owner:npg_YTJ0DsB9ZFGE@ep-muddy-bread-a21balh3-pooler.eu-central-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require' && npm run test:e2e

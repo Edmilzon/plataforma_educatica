@@ -25,5 +25,5 @@ export class UserEntity {
   confirmationToken: string | null;
 
   @OneToMany(() => RoleUserEntity, userRole => userRole.user)
-  user_role: RoleUserEntity;
+  user_role: RoleUserEntity[];
 }

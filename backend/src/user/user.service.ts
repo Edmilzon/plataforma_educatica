@@ -1,33 +1,52 @@
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 import * as crypto from 'crypto';
 
 import { UserDto } from './dto/user.dto';
 import { UserEntity } from './entity/user.entity';
+import { RoleEntity } from './entity/role.entity';
+import { RoleUserEntity } from './entity/role_user.entity';
 
 @Injectable()
 export class UserService {
   constructor(
     @InjectRepository(UserEntity)
     public readonly userRepository: Repository<UserEntity>,
+    @InjectRepository(RoleEntity)
+    private readonly roleRepository: Repository<RoleEntity>,
+    @InjectRepository(RoleUserEntity)
+    private readonly roleUserRepository: Repository<RoleUserEntity>,
   ) {}
 
   //Register user
   async registerUser(date: UserDto): Promise<UserEntity> {
     const validate = await this.validateExists(date.email);
     if (validate)
-      throw new BadRequestException('El correo o telefono ya existe');
+      throw new BadRequestException('El correo ya existe');
+
+    const role = await this.roleRepository.findOne({ where: { name: date.role } });
+    if (!role) {
+      throw new NotFoundException(`El rol '${date.role}' no existe.`);
+    }
 
     const new_user = new UserEntity();
     new_user.email = date.email;
     new_user.password = await bcrypt.hash(date.password, 10);
     new_user.name = date.name;
     new_user.lastname = date.lastname;
-    new_user.role = date.role;
     new_user.confirmationToken = crypto.randomBytes(32).toString('hex');
-    return this.userRepository.save(new_user);
+    const savedUser = await this.userRepository.save(new_user);
+
+    const userRole = this.roleUserRepository.create({ user: savedUser, role });
+    await this.roleUserRepository.save(userRole);
+
+    return savedUser;
   }
 
   async validateExists(mail: string): Promise<boolean> {
@@ -49,5 +68,24 @@ export class UserService {
       where: { confirmationToken: token },
     });
     return user ?? undefined;
+  }
+
+  async getProfile(id: string): Promise<UserEntity> {
+    const user = await this.userRepository.findOne({
+      where: { uuid_user: id },
+      relations: ['user_role', 'user_role.role'],
+    });
+
+    if (!user) throw new NotFoundException('Usuario no encontrado.');
+
+    const { password, ...userWithoutPassword } = user;
+    return userWithoutPassword as UserEntity;
+  }
+
+  async getusers(): Promise<UserEntity[]> {
+    const users = await this.userRepository.find({
+      relations: ['user_role', 'user_role.role'],
+    });
+    return users;
   }
 }
