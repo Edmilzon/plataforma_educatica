@@ -1,4 +1,5 @@
-import { Column, PrimaryGeneratedColumn, Entity } from 'typeorm';
+import { Column, PrimaryGeneratedColumn, Entity, OneToMany } from 'typeorm';
+import { RoleUserEntity } from './role_user.entity';
 
 @Entity('user')
 export class UserEntity {
@@ -17,12 +18,12 @@ export class UserEntity {
   @Column({ length: 50 })
   lastname: string;
 
-  @Column({ length: 50, default: 'student' })
-  role: string;
-
   @Column({ default: false })
   isConfirmed: boolean;
 
   @Column({ type: 'varchar', nullable: true })
   confirmationToken: string | null;
+
+  @OneToMany(() => RoleUserEntity, userRole => userRole.user)
+  user_role: RoleUserEntity;
 }
