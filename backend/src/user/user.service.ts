@@ -5,6 +5,7 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import * as bcrypt from 'bcrypt';
 import * as crypto from 'crypto';
 
@@ -22,17 +23,20 @@ export class UserService {
     private readonly roleRepository: Repository<RoleEntity>,
     @InjectRepository(RoleUserEntity)
     private readonly roleUserRepository: Repository<RoleUserEntity>,
+    private readonly configService: ConfigService,
   ) {}
 
   //Register user
-  async registerUser(date: UserDto): Promise<UserEntity> {
+  async registerUser(date: UserDto, isGoogleSignIn = false): Promise<UserEntity> {
     const validate = await this.validateExists(date.email);
     if (validate)
       throw new BadRequestException('El correo ya existe');
 
-    const role = await this.roleRepository.findOne({ where: { name: date.role } });
+    const roleName = this.configService.get<string>('DEFAULT_USER_ROLE') || 'alumno';
+
+    const role = await this.roleRepository.findOne({ where: { name: roleName } });
     if (!role) {
-      throw new NotFoundException(`El rol '${date.role}' no existe.`);
+      throw new NotFoundException(`El rol '${roleName}' no existe.`);
     }
 
     const new_user = new UserEntity();
@@ -40,7 +44,12 @@ export class UserService {
     new_user.password = await bcrypt.hash(date.password, 10);
     new_user.name = date.name;
     new_user.lastname = date.lastname;
-    new_user.confirmationToken = crypto.randomBytes(32).toString('hex');
+
+    if (isGoogleSignIn) {
+      new_user.isConfirmed = true;
+    } else {
+      new_user.confirmationToken = crypto.randomBytes(32).toString('hex');
+    }
     const savedUser = await this.userRepository.save(new_user);
 
     const userRole = this.roleUserRepository.create({ user: savedUser, role });

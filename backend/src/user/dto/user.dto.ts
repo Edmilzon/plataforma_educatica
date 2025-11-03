@@ -15,7 +15,4 @@ export class UserDto {
 
   @IsString()
   lastname: string;
-
-  @IsString()
-  role: string;
 }
