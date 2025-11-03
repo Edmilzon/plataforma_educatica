@@ -78,3 +78,13 @@ export const LOGIN_GOOGLE_USER = async (email: string) => {
     HANDLE_AXIOS_ERROR(error);
   }
 };
+
+export const getAllUsers = async (token: string) => {
+  const res = await fetch(`${API_URL}/user/all`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  if (!res.ok) throw new Error("Error al obtener usuarios");
+  return res.json();
+};
