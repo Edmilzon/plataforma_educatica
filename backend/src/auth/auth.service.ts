@@ -8,7 +8,6 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 
-import { UserEntity } from '../user/entity/user.entity';
 import { GoogleAuthDto } from './dto/google-auth.dto';
 import { AuthDto } from './dto/auth.dto';
 
@@ -23,7 +22,6 @@ export class AuthService {
     const user = await this.userService.search_email(data.email);
 
     if (!user || !user.password) {
-      // Si el usuario no existe o no tiene contraseña (p.ej. registro con Google)
       throw new UnauthorizedException('Credenciales incorrectas');
     }
 
@@ -39,7 +37,8 @@ export class AuthService {
       );
     }
 
-    return this.generateTokenAndUserResponse(user);
+    const userProfile = await this.userService.getProfile(user.uuid_user);
+    return this.generateTokenAndUserResponse(userProfile);
   }
 
   async signInWithGoogle(googleUser: GoogleAuthDto) {
@@ -51,22 +50,23 @@ export class AuthService {
 
     let user = await this.userService.search_email(googleUser.email);
 
-    if (!user) {
-      const newUser = new UserEntity();
-      newUser.email = googleUser.email;
-      newUser.name = googleUser.name;
-      newUser.lastname = googleUser.lastname;
-      newUser.isConfirmed = true;
-      user = await this.userService.userRepository.save(newUser);
+    if (!user) {      
+      const newUserDto = {
+        email: googleUser.email,
+        name: googleUser.name,
+        lastname: googleUser.lastname,
+        password: `google-user-${Date.now()}`
+      };
+      user = await this.userService.registerUser(newUserDto, true);
     }
-
-    return this.generateTokenAndUserResponse(user);
+    const userProfile = await this.userService.getProfile(user.uuid_user);
+    return this.generateTokenAndUserResponse(userProfile);
   }
 
-  private generateTokenAndUserResponse(user: UserEntity) {
+  private async generateTokenAndUserResponse(user: import("../user/entity/user.entity").UserEntity) {
     const payload = { sub: user.uuid_user, email: user.email };
     const token = this.jwtService.sign(payload);
-    const { password: _password, ...userWithoutPassword } = user;
+    const { password: _password, confirmationToken: _token, ...userWithoutPassword } = user;
 
     return { token, user: userWithoutPassword };
   }

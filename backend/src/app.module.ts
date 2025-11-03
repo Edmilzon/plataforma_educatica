@@ -10,12 +10,14 @@ import { EmailModule } from './email/email.module';
 import { UserEntity } from './user/entity/user.entity';
 import { RoleEntity } from './user/entity/role.entity';
 import { RoleUserEntity } from './user/entity/role_user.entity';
+import { AuthModule } from './auth/auth.module';
+import { AdminModule } from './admin/admin.module';
 
 export const AppDataSourceOptions: DataSourceOptions = {
   type: 'postgres',
   url: process.env.DB_URL,
   entities: [UserEntity, RoleEntity, RoleUserEntity],
-  synchronize: false,
+  synchronize: true,
   migrations: [__dirname + '/user/entity/1716928800000-SeedRoles.ts'],
   migrationsTableName: 'migrations_seeders', 
 };
@@ -29,6 +31,8 @@ export const AppDataSourceOptions: DataSourceOptions = {
     }),
     UserModule,
     EmailModule,
+    AuthModule,
+    AdminModule
   ],
   controllers: [AppController],
   providers: [AppService],
