@@ -9,6 +9,7 @@ export default withAuth(
     const isAdminPage = req.nextUrl.pathname.startsWith("/admin");
     const isDashboardPage = req.nextUrl.pathname.startsWith("/dashboard");
     const path = req.nextUrl.pathname;
+
     //rutas publicas
     const isPublicPage =
       path.startsWith("/user/login") || path.startsWith("/user/register");
@@ -24,6 +25,14 @@ export default withAuth(
       return NextResponse.redirect(
         new URL(`/user/login?callbackURL=${req.nextUrl.pathname}`, req.url),
       );
+    }
+
+    if (isAuth && isAdminPage) {
+      const roles: string[] = token.roles || [];
+      console.log("Roles del usuario:", roles);
+      if (!roles.includes("administrador")) {
+        return NextResponse.redirect(new URL("/dashboard", req.url));
+      }
     }
 
     return NextResponse.next();

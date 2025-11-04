@@ -15,7 +15,13 @@ const HOME = () => {
         token: session.accessToken,
         user: session.userData,
       });
-      router.push("/dashboard");
+      const roles: string[] =
+        session.userData.user_role?.map((r: any) => r.role.name) || [];
+      if (roles.includes("administrador")) {
+        router.push("/admin/users");
+      } else {
+        router.push("/dashboard");
+      }
     }
   }, [session, router]);
 
