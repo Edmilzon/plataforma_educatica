@@ -90,10 +90,10 @@ const DROPDOWN_MENU = ({
           >
             <ul className="flex flex-col text-sm text-gray-700">
               {[
-                "Administrador",
-                "Estudiante",
-                "Docente Editor",
-                "Docente Ejecutador",
+                "alumno",
+                "profesor que inicia el curso",
+                "profesor que crea el curso",
+                "administrador"
               ].map((role) => (
                 <li key={role}>
                   <button
