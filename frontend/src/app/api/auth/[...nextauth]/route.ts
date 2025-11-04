@@ -45,8 +45,9 @@ const HANDLER = NextAuth({
             name: data.user.name,
             email: data.user.email,
             lastname: data.user.lastname,
-            // nueva funcion agregada roles en caso de error borrarlo 
-          roles: data.user.user_role?.map((r: any) => r.role.name) || [],
+            // nueva funcion agregada roles en caso de error borrarlo
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            roles: data.user.user_role?.map((r: any) => r.role.name) || [],
             apiToken: data.token,
             apiUser: data.user,
           };
@@ -93,10 +94,12 @@ const HANDLER = NextAuth({
           (user as any).apiToken = login_data.token;
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           (user as any).apiUser = login_data.user;
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           (user as any).apiToken = login_data.token;
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          (user as any).roles = login_data.user.user_role?.map((r: any) => r.role.name) || [];
-           // nueva funcion agregada roles en caso de error borrarlo 
+          (user as any).roles =
+            login_data.user.user_role?.map((r: any) => r.role.name) || [];
+          // nueva funcion agregada roles en caso de error borrarlo
           return true;
         } catch (error) {
           console.error("Error en signIn con Google:", error);
@@ -113,7 +116,7 @@ const HANDLER = NextAuth({
         token.apiUser = (user as any).apiUser;
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         token.roles = (user as any).roles || [];
-         // nueva funcion agregada roles en caso de error borrarlo 
+        // nueva funcion agregada roles en caso de error borrarlo
       }
       return token;
     },

@@ -93,7 +93,7 @@ const DROPDOWN_MENU = ({
                 "alumno",
                 "profesor que inicia el curso",
                 "profesor que crea el curso",
-                "administrador"
+                "administrador",
               ].map((role) => (
                 <li key={role}>
                   <button
