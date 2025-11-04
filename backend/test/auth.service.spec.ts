@@ -152,6 +152,7 @@ describe('AuthService', () => {
     });
 
     it('should throw BadRequestException if googleUser is invalid', async () => {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
       await expect(service.signInWithGoogle({} as any)).rejects.toThrow(
         BadRequestException,
       );
