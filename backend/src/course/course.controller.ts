@@ -10,10 +10,11 @@ import {
   Req,
   ParseUUIDPipe,
 } from '@nestjs/common';
+import { AuthGuard } from '@nestjs/passport';
+
 import { CourseService } from './course.service';
 import { CourseDto } from './dto/course.dto';
 import { UpdateCourseDto } from './dto/update-course.dto';
-import { AuthGuard } from '@nestjs/passport';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { Role } from '../auth/models/roles.model';

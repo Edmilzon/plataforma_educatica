@@ -1,14 +1,14 @@
 import { Test, TestingModule } from '@nestjs/testing';
+import { AuthGuard } from '@nestjs/passport';
+
 import { CourseController } from '../src/course/course.controller';
 import { CourseService } from '../src/course/course.service';
-import { AuthGuard } from '@nestjs/passport';
 import { RolesGuard } from '../src/auth/guards/roles.guard';
 import { UserEntity } from '../src/user/entity/user.entity';
 import { CourseDto } from '../src/course/dto/course.dto';
 import { UpdateCourseDto } from '../src/course/dto/update-course.dto';
-import { Role } from '../src/auth/models/roles.model';
 
-const mockUser: UserEntity = {
+const MOCK_USER: UserEntity = {
   uuid_user: 'user-uuid-1',
   email: 'test@example.com',
   name: 'Test',
@@ -19,11 +19,11 @@ const mockUser: UserEntity = {
   user_role: [],
 };
 
-const mockCourse = {
+const MOCK_COURSE = {
   uuid_course: 'course-uuid-1',
   title: 'Test Course',
   description: 'Test Description',
-  creator: mockUser,
+  creator: MOCK_USER,
 };
 
 describe('CourseController', () => {
@@ -31,11 +31,15 @@ describe('CourseController', () => {
   let service: CourseService;
 
   const mockCourseService = {
-    create: jest.fn().mockResolvedValue(mockCourse),
-    findAll: jest.fn().mockResolvedValue([mockCourse]),
-    findOne: jest.fn().mockResolvedValue(mockCourse),
-    update: jest.fn().mockResolvedValue({ ...mockCourse, title: 'Updated Course' }),
-    remove: jest.fn().mockResolvedValue({ message: 'Curso con UUID course-uuid-1 ha sido eliminado correctamente.' }),
+    create: jest.fn().mockResolvedValue(MOCK_COURSE),
+    findAll: jest.fn().mockResolvedValue([MOCK_COURSE]),
+    findOne: jest.fn().mockResolvedValue(MOCK_COURSE),
+    update: jest
+      .fn()
+      .mockResolvedValue({ ...MOCK_COURSE, title: 'Updated Course' }),
+    remove: jest.fn().mockResolvedValue({
+      message: 'Curso con UUID course-uuid-1 ha sido eliminado correctamente.',
+    }),
   };
 
   beforeEach(async () => {
@@ -68,19 +72,19 @@ describe('CourseController', () => {
         title: 'Test Course',
         description: 'Test Description',
       };
-      const req = { user: mockUser };
+      const req = { user: MOCK_USER };
 
       const result = await controller.create(courseDto, req);
 
-      expect(result).toEqual(mockCourse);
-      expect(service.create).toHaveBeenCalledWith(courseDto, mockUser);
+      expect(result).toEqual(MOCK_COURSE);
+      expect(service.create).toHaveBeenCalledWith(courseDto, MOCK_USER);
     });
   });
 
   describe('findAll', () => {
     it('should return an array of courses', async () => {
       const result = await controller.findAll();
-      expect(result).toEqual([mockCourse]);
+      expect(result).toEqual([MOCK_COURSE]);
       expect(service.findAll).toHaveBeenCalled();
     });
   });
@@ -89,7 +93,7 @@ describe('CourseController', () => {
     it('should return a single course', async () => {
       const uuid = 'course-uuid-1';
       const result = await controller.findOne(uuid);
-      expect(result).toEqual(mockCourse);
+      expect(result).toEqual(MOCK_COURSE);
       expect(service.findOne).toHaveBeenCalledWith(uuid);
     });
   });
@@ -111,7 +115,9 @@ describe('CourseController', () => {
       const uuid = 'course-uuid-1';
       const result = await controller.remove(uuid);
 
-      expect(result).toEqual({ message: `Curso con UUID ${uuid} ha sido eliminado correctamente.` });
+      expect(result).toEqual({
+        message: `Curso con UUID ${uuid} ha sido eliminado correctamente.`,
+      });
       expect(service.remove).toHaveBeenCalledWith(uuid);
     });
   });

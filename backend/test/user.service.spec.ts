@@ -104,8 +104,12 @@ describe('UserService', () => {
       });
       expect(bcrypt.hash).toHaveBeenCalledWith(userDto.password, 10);
       expect(crypto.randomBytes).toHaveBeenCalledWith(32);
-      expect(mockUserRepository.save).toHaveBeenCalledWith(expect.any(UserEntity));
-      expect(mockRoleRepository.findOne).toHaveBeenCalledWith({ where: { name: 'alumno' } });
+      expect(mockUserRepository.save).toHaveBeenCalledWith(
+        expect.any(UserEntity),
+      );
+      expect(mockRoleRepository.findOne).toHaveBeenCalledWith({
+        where: { name: 'alumno' },
+      });
       expect(mockRoleUserRepository.create).toHaveBeenCalled();
       expect(mockRoleUserRepository.save).toHaveBeenCalledWith(userRole);
       expect(result.email).toBe(userDto.email);
@@ -138,7 +142,9 @@ describe('UserService', () => {
       mockUserRepository.exists.mockResolvedValue(false);
       mockRoleRepository.findOne.mockResolvedValue(null);
 
-      await expect(service.registerUser(userDto)).rejects.toThrow(NotFoundException);
+      await expect(service.registerUser(userDto)).rejects.toThrow(
+        NotFoundException,
+      );
     });
   });
 });

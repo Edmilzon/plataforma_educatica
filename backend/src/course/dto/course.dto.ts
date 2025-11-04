@@ -1,11 +1,11 @@
-import { IsNotEmpty, IsString, MinLength } from "class-validator";
+import { IsNotEmpty, IsString, MinLength } from 'class-validator';
 
 export class CourseDto {
-    @IsNotEmpty()
-    @MinLength(3)
-    title: string;
+  @IsNotEmpty()
+  @MinLength(3)
+  title: string;
 
-    @IsNotEmpty()
-    @IsString()
-    description: string;
+  @IsNotEmpty()
+  @IsString()
+  description: string;
 }

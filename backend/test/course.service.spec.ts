@@ -1,16 +1,15 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
+import { NotFoundException } from '@nestjs/common';
+
 import { CourseService } from '../src/course/course.service';
 import { CourseEntity } from '../src/course/entity/course.entity';
 import { UserEntity } from '../src/user/entity/user.entity';
-import { Repository } from 'typeorm';
-import { NotFoundException } from '@nestjs/common';
 import { CourseDto } from '../src/course/dto/course.dto';
 import { UpdateCourseDto } from '../src/course/dto/update-course.dto';
 
 describe('CourseService', () => {
   let service: CourseService;
-  let courseRepository: Repository<CourseEntity>;
 
   const mockCourseRepository = {
     create: jest.fn(),
@@ -32,12 +31,14 @@ describe('CourseService', () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         CourseService,
-        { provide: getRepositoryToken(CourseEntity), useValue: mockCourseRepository },
+        {
+          provide: getRepositoryToken(CourseEntity),
+          useValue: mockCourseRepository,
+        },
       ],
     }).compile();
 
     service = module.get<CourseService>(CourseService);
-    courseRepository = module.get<Repository<CourseEntity>>(getRepositoryToken(CourseEntity));
   });
 
   it('should be defined', () => {
@@ -46,13 +47,19 @@ describe('CourseService', () => {
 
   describe('create', () => {
     it('should create a course', async () => {
-      const courseDto: CourseDto = { title: 'New Course', description: 'A new course' };
+      const courseDto: CourseDto = {
+        title: 'New Course',
+        description: 'A new course',
+      };
       mockCourseRepository.create.mockReturnValue(mockCourse);
       mockCourseRepository.save.mockResolvedValue(mockCourse);
 
       const result = await service.create(courseDto, mockUser);
       expect(result).toEqual(mockCourse);
-      expect(mockCourseRepository.create).toHaveBeenCalledWith({ ...courseDto, creator: mockUser });
+      expect(mockCourseRepository.create).toHaveBeenCalledWith({
+        ...courseDto,
+        creator: mockUser,
+      });
       expect(mockCourseRepository.save).toHaveBeenCalledWith(mockCourse);
     });
   });
@@ -66,7 +73,9 @@ describe('CourseService', () => {
 
     it('should throw NotFoundException if course not found', async () => {
       mockCourseRepository.findOne.mockResolvedValue(null);
-      await expect(service.findOne('non-existent-uuid')).rejects.toThrow(NotFoundException);
+      await expect(service.findOne('non-existent-uuid')).rejects.toThrow(
+        NotFoundException,
+      );
     });
   });
 
@@ -74,10 +83,16 @@ describe('CourseService', () => {
     it('should update a course', async () => {
       const updateDto: UpdateCourseDto = { title: 'Updated Title' };
       jest.spyOn(service, 'findOne').mockResolvedValue(mockCourse);
-      mockCourseRepository.save.mockResolvedValue({ ...mockCourse, ...updateDto });
+      mockCourseRepository.save.mockResolvedValue({
+        ...mockCourse,
+        ...updateDto,
+      });
 
       const result = await service.update('course-uuid', updateDto);
-      expect(mockCourseRepository.merge).toHaveBeenCalledWith(mockCourse, updateDto);
+      expect(mockCourseRepository.merge).toHaveBeenCalledWith(
+        mockCourse,
+        updateDto,
+      );
       expect(result.title).toEqual('Updated Title');
     });
   });
@@ -86,12 +101,16 @@ describe('CourseService', () => {
     it('should remove a course', async () => {
       mockCourseRepository.delete.mockResolvedValue({ affected: 1 });
       const result = await service.remove('course-uuid');
-      expect(result).toEqual({ message: `Curso con UUID course-uuid ha sido eliminado correctamente.` });
+      expect(result).toEqual({
+        message: `Curso con UUID course-uuid ha sido eliminado correctamente.`,
+      });
     });
 
     it('should throw NotFoundException if course to remove is not found', async () => {
       mockCourseRepository.delete.mockResolvedValue({ affected: 0 });
-      await expect(service.remove('non-existent-uuid')).rejects.toThrow(NotFoundException);
+      await expect(service.remove('non-existent-uuid')).rejects.toThrow(
+        NotFoundException,
+      );
     });
   });
 });

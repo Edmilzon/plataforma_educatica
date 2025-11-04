@@ -50,12 +50,12 @@ export class AuthService {
 
     let user = await this.userService.search_email(googleUser.email);
 
-    if (!user) {      
+    if (!user) {
       const newUserDto = {
         email: googleUser.email,
         name: googleUser.name,
         lastname: googleUser.lastname,
-        password: `google-user-${Date.now()}`
+        password: `google-user-${Date.now()}`,
       };
       user = await this.userService.registerUser(newUserDto, true);
     }
@@ -63,10 +63,16 @@ export class AuthService {
     return this.generateTokenAndUserResponse(userProfile);
   }
 
-  private async generateTokenAndUserResponse(user: import("../user/entity/user.entity").UserEntity) {
+  private generateTokenAndUserResponse(
+    user: import('../user/entity/user.entity').UserEntity,
+  ) {
     const payload = { sub: user.uuid_user, email: user.email };
     const token = this.jwtService.sign(payload);
-    const { password: _password, confirmationToken: _token, ...userWithoutPassword } = user;
+    const {
+      password: _password,
+      confirmationToken: _token,
+      ...userWithoutPassword
+    } = user;
 
     return { token, user: userWithoutPassword };
   }
@@ -85,8 +91,7 @@ export class AuthService {
     await this.userService.userRepository.save(user);
 
     return {
-      message:
-        'Correo electrónico confirmado con éxito',
+      message: 'Correo electrónico confirmado con éxito',
     };
   }
 }

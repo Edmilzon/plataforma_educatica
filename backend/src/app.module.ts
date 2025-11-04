@@ -14,27 +14,27 @@ import { AuthModule } from './auth/auth.module';
 import { AdminModule } from './admin/admin.module';
 import { CourseModule } from './course/course.module';
 
-export const AppDataSourceOptions: DataSourceOptions = {
+export const APP_DATA_SOURCE_OPTIONS: DataSourceOptions = {
   type: 'postgres',
   url: process.env.DB_URL,
   entities: [UserEntity, RoleEntity, RoleUserEntity],
   synchronize: true,
   migrations: [__dirname + '/user/entity/1716928800000-SeedRoles.ts'],
-  migrationsTableName: 'migrations_seeders', 
+  migrationsTableName: 'migrations_seeders',
 };
 
 @Module({
   imports: [
     ConfigModule.forRoot(),
     TypeOrmModule.forRoot({
-      ...AppDataSourceOptions,
-      autoLoadEntities: true, 
+      ...APP_DATA_SOURCE_OPTIONS,
+      autoLoadEntities: true,
     }),
     UserModule,
     EmailModule,
     AuthModule,
     AdminModule,
-    CourseModule
+    CourseModule,
   ],
   controllers: [AppController],
   providers: [AppService],

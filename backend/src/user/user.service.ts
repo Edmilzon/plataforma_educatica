@@ -26,18 +26,14 @@ export class UserService {
     private readonly configService: ConfigService,
   ) {}
 
-  //Register user
-  async registerUser(date: UserDto, isGoogleSignIn = false): Promise<UserEntity> {
+  async registerUser(
+    date: UserDto,
+    isGoogleSignIn = false,
+  ): Promise<UserEntity> {
     const validate = await this.validateExists(date.email);
-    if (validate)
-      throw new BadRequestException('El correo ya existe');
+    if (validate) throw new BadRequestException('El correo ya existe');
 
-    const roleName = this.configService.get<string>('DEFAULT_USER_ROLE') || 'alumno';
-
-    const role = await this.roleRepository.findOne({ where: { name: roleName } });
-    if (!role) {
-      throw new NotFoundException(`El rol '${roleName}' no existe.`);
-    }
+    const role = await this.getDefaultRole();
 
     const new_user = new UserEntity();
     new_user.email = date.email;
@@ -56,6 +52,18 @@ export class UserService {
     await this.roleUserRepository.save(userRole);
 
     return savedUser;
+  }
+
+  private async getDefaultRole(): Promise<RoleEntity> {
+    const roleName =
+      this.configService.get<string>('DEFAULT_USER_ROLE') ?? 'alumno';
+
+    const role = await this.roleRepository.findOne({
+      where: { name: roleName },
+    });
+
+    if (!role) throw new NotFoundException(`El rol '${roleName}' no existe.`);
+    return role;
   }
 
   async validateExists(mail: string): Promise<boolean> {
@@ -87,7 +95,7 @@ export class UserService {
 
     if (!user) throw new NotFoundException('Usuario no encontrado.');
 
-    const { password, ...userWithoutPassword } = user;
+    const { ...userWithoutPassword } = user;
     return userWithoutPassword as UserEntity;
   }
 

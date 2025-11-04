@@ -1,6 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+
 import { CourseEntity } from './entity/course.entity';
 import { CourseDto } from './dto/course.dto';
 import { UpdateCourseDto } from './dto/update-course.dto';
@@ -34,7 +35,9 @@ export class CourseService {
       relations: ['creator'],
     });
     if (!course) {
-      throw new NotFoundException(`Curso con UUID ${uuid_course} no encontrado.`);
+      throw new NotFoundException(
+        `Curso con UUID ${uuid_course} no encontrado.`,
+      );
     }
     return course;
   }
@@ -51,7 +54,9 @@ export class CourseService {
   async remove(uuid_course: string): Promise<{ message: string }> {
     const result = await this.courseRepository.delete(uuid_course);
     if (result.affected === 0) {
-      throw new NotFoundException(`Curso con UUID ${uuid_course} no encontrado.`);
+      throw new NotFoundException(
+        `Curso con UUID ${uuid_course} no encontrado.`,
+      );
     }
     return {
       message: `Curso con UUID ${uuid_course} ha sido eliminado correctamente.`,

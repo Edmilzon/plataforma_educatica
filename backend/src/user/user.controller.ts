@@ -8,8 +8,9 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { EmailService } from 'src/email/email.service';
-
 import { AuthGuard } from '@nestjs/passport';
+import { Request } from 'express';
+
 import { UserService } from './user.service';
 import { UserDto } from './dto/user.dto';
 
@@ -50,7 +51,7 @@ export class UserController {
 
   @Get('profile')
   @UseGuards(AuthGuard('jwt'))
-  getProfile(@Req() req) {
+  getProfile(@Req() req: Request & { user: { uuid_user: string } }) {
     return this.userService.getProfile(req.user.uuid_user);
   }
 

@@ -6,11 +6,11 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
+import { GoogleAuthDto } from 'src/auth/dto/google-auth.dto';
 
 import { AuthService } from '../src/auth/auth.service';
 import { UserService } from '../src/user/user.service';
 import { UserEntity } from '../src/user/entity/user.entity';
-import { GoogleAuthDto } from 'src/auth/dto/google-auth.dto';
 
 jest.mock('bcrypt');
 
