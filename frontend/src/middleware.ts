@@ -9,6 +9,11 @@ export default withAuth(
     const isAdminPage = req.nextUrl.pathname.startsWith('/admin');
     const isDashboardPage = req.nextUrl.pathname.startsWith('/dashboard');
     const path = req.nextUrl.pathname;
+
+ console.log("Token recibido:", token);
+
+
+
     //rutas publicas
     const isPublicPage =path.startsWith("/user/login") || path.startsWith("/user/register");
     
