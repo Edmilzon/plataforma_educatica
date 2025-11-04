@@ -63,12 +63,10 @@ export class AuthService {
     return this.generateTokenAndUserResponse(userProfile);
   }
 
-  private async generateTokenAndUserResponse(
+  private generateTokenAndUserResponse(
     user: import('../user/entity/user.entity').UserEntity,
   ) {
-    const userProfile = await this.userService.getProfile(user.uuid_user);
-    const roles = userProfile.user_role.map(ur => ur.role.name);
-    const payload = { sub: user.uuid_user, email: user.email ,roles};
+    const payload = { sub: user.uuid_user, email: user.email };
     const token = this.jwtService.sign(payload);
     const {
       password: _password,
