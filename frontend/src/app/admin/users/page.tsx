@@ -36,6 +36,7 @@ const USERS = () => {
       try {
         const data = await GET_USERS(token);
         setUsers(
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           data.map((u: any) => ({
             id: u.uuid_user,
             name: `${u.name} ${u.lastname}`,

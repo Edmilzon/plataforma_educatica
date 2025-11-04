@@ -1,9 +1,16 @@
 import { withAuth } from "next-auth/middleware";
 import { NextResponse } from "next/server";
+/* eslint-disable  complexity */
+
+type AuthToken = {
+  roles?: string[];
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  [key: string]: any;
+};
 
 export default withAuth(
   function middleware(req) {
-    const token = req.nextauth.token;
+    const token = req.nextauth.token as AuthToken;
     const isAuth = !!token;
     const isAuthPage = req.nextUrl.pathname.startsWith("/auth");
     const isAdminPage = req.nextUrl.pathname.startsWith("/admin");
@@ -44,7 +51,7 @@ export default withAuth(
   },
 );
 
-export const config = {
+export const CONFIG = {
   matcher: [
     "/dashboard/:path*",
     "/admin/:path*",

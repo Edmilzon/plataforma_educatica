@@ -59,6 +59,7 @@ const DROPDOWN_MENU = ({
   const handleRoleChange = async (newRole: string) => {
     try {
       const res = await UPDATE_ROLE(token, userId, newRole);
+      console.log("Rol actualizado:", res.message);
       onRoleUpdated(userId, newRole);
       onToggle();
     } catch (error) {

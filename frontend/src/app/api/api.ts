@@ -98,6 +98,7 @@ export const UPDATE_ROLE = async (
     const res = await fetch("http://127.0.0.1:5000/admin/role/update", {
       method: "POST",
       headers: {
+        //eslint-disable-next-line @typescript-eslint/naming-convention
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
       },
@@ -122,6 +123,7 @@ export const CREATE_CURSO = async (
     const res = await fetch("http://127.0.0.1:5000/course", {
       method: "POST",
       headers: {
+        //eslint-disable-next-line @typescript-eslint/naming-convention
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
       },

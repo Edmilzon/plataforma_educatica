@@ -98,6 +98,7 @@ const HANDLER = NextAuth({
           (user as any).apiToken = login_data.token;
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           (user as any).roles =
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             login_data.user.user_role?.map((r: any) => r.role.name) || [];
           // nueva funcion agregada roles en caso de error borrarlo
           return true;
