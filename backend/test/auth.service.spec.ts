@@ -103,6 +103,7 @@ describe('AuthService', () => {
         lastname: 'User',
         isConfirmed: true,
         confirmationToken: null,
+        user_role: [],
       };
       const loginDto = { email: 'test@example.com', password: 'wrongpassword' };
 
@@ -151,7 +152,7 @@ describe('AuthService', () => {
     });
 
     it('should throw BadRequestException if googleUser is invalid', async () => {
-      await expect(service.signInWithGoogle(null)).rejects.toThrow(
+      await expect(service.signInWithGoogle({} as any)).rejects.toThrow(
         BadRequestException,
       );
     });
