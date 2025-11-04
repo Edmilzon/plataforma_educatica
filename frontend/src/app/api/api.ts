@@ -112,3 +112,27 @@ export const UPDATE_ROLE = async (
     throw error;
   }
 };
+
+export const CREATE_CURSO = async (
+  token: string,
+  title: string,
+  description: string,
+) => {
+  try {
+    const res = await fetch("http://127.0.0.1:5000/course", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({ title, description }),
+    });
+
+    if (!res.ok) throw new Error("Error al actualizar el rol");
+
+    return await res.json();
+  } catch (error) {
+    console.error("Error en CREATE_CURSO:", error);
+    throw error;
+  }
+};
