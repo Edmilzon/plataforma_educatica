@@ -5,6 +5,7 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+
 import { UserEntity } from '../user/entity/user.entity';
 import { RoleEntity } from '../user/entity/role.entity';
 import { RoleUserEntity } from '../user/entity/role_user.entity';
@@ -21,7 +22,9 @@ export class AdminService {
     private readonly roleUserRepository: Repository<RoleUserEntity>,
   ) {}
 
-  async updateUserRole(updateRoleDto: UpdateRoleDto): Promise<{ message: string }> {
+  async updateUserRole(
+    updateRoleDto: UpdateRoleDto,
+  ): Promise<{ message: string }> {
     const { userId, roleName } = updateRoleDto;
 
     const user = await this.userRepository.findOneBy({ uuid_user: userId });
@@ -34,10 +37,14 @@ export class AdminService {
       throw new NotFoundException(`Rol '${roleName}' no encontrado.`);
     }
 
-    let userRole = await this.roleUserRepository.findOne({ where: { user: { uuid_user: userId } } });
+    const userRole = await this.roleUserRepository.findOne({
+      where: { user: { uuid_user: userId } },
+    });
 
     if (!userRole) {
-      throw new BadRequestException(`El usuario no tiene un rol asignado para modificar.`);
+      throw new BadRequestException(
+        `El usuario no tiene un rol asignado para modificar.`,
+      );
     }
 
     userRole.role = role;

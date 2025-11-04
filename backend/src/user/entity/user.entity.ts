@@ -1,4 +1,5 @@
 import { Column, PrimaryGeneratedColumn, Entity, OneToMany } from 'typeorm';
+
 import { RoleUserEntity } from './role_user.entity';
 
 @Entity('user')
@@ -24,6 +25,6 @@ export class UserEntity {
   @Column({ type: 'varchar', nullable: true })
   confirmationToken: string | null;
 
-  @OneToMany(() => RoleUserEntity, userRole => userRole.user)
+  @OneToMany(() => RoleUserEntity, (userRole) => userRole.user)
   user_role: RoleUserEntity[];
 }

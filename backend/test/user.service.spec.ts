@@ -1,11 +1,14 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
+import { ConfigService } from '@nestjs/config';
 import * as bcrypt from 'bcrypt';
 import * as crypto from 'crypto';
-import { BadRequestException } from '@nestjs/common';
+import { BadRequestException, NotFoundException } from '@nestjs/common';
 
 import { UserService } from '../src/user/user.service';
 import { UserEntity } from '../src/user/entity/user.entity';
+import { RoleEntity } from '../src/user/entity/role.entity';
+import { RoleUserEntity } from '../src/user/entity/role_user.entity';
 import { UserDto } from '../src/user/dto/user.dto';
 
 jest.mock('bcrypt');
@@ -15,10 +18,26 @@ describe('UserService', () => {
   let service: UserService;
 
   const mockUserRepository = {
-    findOne: jest.fn(),
-    create: jest.fn(),
     save: jest.fn(),
     exists: jest.fn(),
+  };
+
+  const mockRoleRepository = {
+    findOne: jest.fn(),
+  };
+
+  const mockRoleUserRepository = {
+    create: jest.fn(),
+    save: jest.fn(),
+  };
+
+  const mockConfigService = {
+    get: jest.fn((key: string) => {
+      if (key === 'DEFAULT_USER_ROLE') {
+        return 'alumno';
+      }
+      return null;
+    }),
   };
 
   beforeEach(async () => {
@@ -28,6 +47,18 @@ describe('UserService', () => {
         {
           provide: getRepositoryToken(UserEntity),
           useValue: mockUserRepository,
+        },
+        {
+          provide: getRepositoryToken(RoleEntity),
+          useValue: mockRoleRepository,
+        },
+        {
+          provide: getRepositoryToken(RoleUserEntity),
+          useValue: mockRoleUserRepository,
+        },
+        {
+          provide: ConfigService,
+          useValue: mockConfigService,
         },
       ],
     }).compile();
@@ -48,12 +79,16 @@ describe('UserService', () => {
         lastname: 'User',
         email: 'test@example.com',
         password: 'password123',
-        role: 'student',
       };
       const hashedPassword = 'hashedPassword';
       const confirmationToken = 'random-token';
+      const role = new RoleEntity();
+      role.name = 'alumno';
+      const userRole = new RoleUserEntity();
 
       mockUserRepository.exists.mockResolvedValue(false);
+      mockRoleRepository.findOne.mockResolvedValue(role);
+      mockRoleUserRepository.create.mockReturnValue(userRole);
       (bcrypt.hash as jest.Mock).mockResolvedValue(hashedPassword);
       (crypto.randomBytes as jest.Mock).mockReturnValue({
         toString: () => confirmationToken,
@@ -69,7 +104,14 @@ describe('UserService', () => {
       });
       expect(bcrypt.hash).toHaveBeenCalledWith(userDto.password, 10);
       expect(crypto.randomBytes).toHaveBeenCalledWith(32);
-      expect(mockUserRepository.save).toHaveBeenCalled();
+      expect(mockUserRepository.save).toHaveBeenCalledWith(
+        expect.any(UserEntity),
+      );
+      expect(mockRoleRepository.findOne).toHaveBeenCalledWith({
+        where: { name: 'alumno' },
+      });
+      expect(mockRoleUserRepository.create).toHaveBeenCalled();
+      expect(mockRoleUserRepository.save).toHaveBeenCalledWith(userRole);
       expect(result.email).toBe(userDto.email);
       expect(result.password).toBe(hashedPassword);
       expect(result.confirmationToken).toBe(confirmationToken);
@@ -81,13 +123,27 @@ describe('UserService', () => {
         lastname: 'User',
         email: 'exists@example.com',
         password: 'password123',
-        role: 'student',
       };
 
       mockUserRepository.exists.mockResolvedValue(true);
 
       await expect(service.registerUser(userDto)).rejects.toThrow(
         BadRequestException,
+      );
+    });
+
+    it('should throw NotFoundException if default role does not exist', async () => {
+      const userDto: UserDto = {
+        name: 'Test',
+        lastname: 'User',
+        email: 'test@example.com',
+        password: 'password123',
+      };
+      mockUserRepository.exists.mockResolvedValue(false);
+      mockRoleRepository.findOne.mockResolvedValue(null);
+
+      await expect(service.registerUser(userDto)).rejects.toThrow(
+        NotFoundException,
       );
     });
   });

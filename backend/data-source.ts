@@ -1,6 +1,7 @@
 import { DataSource } from 'typeorm';
 import { config } from 'dotenv';
-import { AppDataSourceOptions } from './src/app.module';
 
-config(); 
-export default new DataSource(AppDataSourceOptions);
+import { APP_DATA_SOURCE_OPTIONS } from './src/app.module';
+
+config();
+export default new DataSource(APP_DATA_SOURCE_OPTIONS);
