@@ -79,7 +79,7 @@ export const LOGIN_GOOGLE_USER = async (email: string) => {
   }
 };
 
-export const getAllUsers = async (token: string) => {
+export const GET_USERS = async (token: string) => {
   const res = await fetch(`${API_URL}/user/all`, {
     headers: {
       Authorization: `Bearer ${token}`,
@@ -87,4 +87,28 @@ export const getAllUsers = async (token: string) => {
   });
   if (!res.ok) throw new Error("Error al obtener usuarios");
   return res.json();
+};
+
+export const UPDATE_ROLE = async (
+  token: string,
+  userId: string,
+  roleName: string,
+) => {
+  try {
+    const res = await fetch("http://127.0.0.1:5000/admin/role/update", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({ userId, roleName }),
+    });
+
+    if (!res.ok) throw new Error("Error al actualizar el rol");
+
+    return await res.json();
+  } catch (error) {
+    console.error("Error en UPDATE_ROLE:", error);
+    throw error;
+  }
 };

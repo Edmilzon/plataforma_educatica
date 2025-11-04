@@ -4,8 +4,25 @@ import { useState, useRef, useEffect } from "react";
 import { CiSquareMore } from "react-icons/ci";
 import { createPortal } from "react-dom";
 
-export default function DropdownMenu() {
-  const [open, setOpen] = useState(false);
+import { UPDATE_ROLE } from "../api/api";
+
+type DropdownMenuProps = {
+  userId: string;
+  token: string;
+  currentRole: string;
+  isOpen: boolean;
+  onToggle: () => void;
+  onRoleUpdated: (userId: string, newRole: string) => void;
+};
+/* eslint-disable max-lines-per-function*/
+const DROPDOWN_MENU = ({
+  userId,
+  token,
+  currentRole,
+  isOpen,
+  onToggle,
+  onRoleUpdated,
+}: DropdownMenuProps) => {
   const [menuPosition, setMenuPosition] = useState<{
     top: number;
     left: number;
@@ -14,16 +31,19 @@ export default function DropdownMenu() {
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
+      const menuElement = document.getElementById("dropdown-menu-${userId}");
       if (
         buttonRef.current &&
-        !buttonRef.current.contains(event.target as Node)
+        !buttonRef.current.contains(event.target as Node) &&
+        menuElement &&
+        !menuElement.contains(event.target as Node)
       ) {
-        setOpen(false);
+        onToggle();
       }
     };
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
+  }, [userId, onToggle]);
 
   const toggleMenu = () => {
     if (buttonRef.current) {
@@ -33,7 +53,18 @@ export default function DropdownMenu() {
         left: rect.right + window.scrollX - 160,
       });
     }
-    setOpen((prev) => !prev);
+    onToggle();
+  };
+
+  const handleRoleChange = async (newRole: string) => {
+    try {
+      const res = await UPDATE_ROLE(token, userId, newRole);
+      onRoleUpdated(userId, newRole);
+      onToggle();
+    } catch (error) {
+      console.error("Error al cambiar rol", error);
+      alert("Error al actulizar el rol");
+    }
   };
 
   return (
@@ -47,7 +78,7 @@ export default function DropdownMenu() {
         <CiSquareMore size={24} />
       </button>
 
-      {open &&
+      {isOpen &&
         createPortal(
           <div
             className="absolute z-[9999] w-44 bg-white border border-gray-200 rounded-xl shadow-lg animate-fade-in"
@@ -58,54 +89,30 @@ export default function DropdownMenu() {
             }}
           >
             <ul className="flex flex-col text-sm text-gray-700">
-              <li>
-                <button
-                  className="w-full text-left px-4 py-2 hover:bg-gray-100 rounded-t-xl"
-                  onClick={() => {
-                    alert("Admin seleccionado");
-                    setOpen(false);
-                  }}
-                >
-                  Admin
-                </button>
-              </li>
-              <li>
-                <button
-                  className="w-full text-left px-4 py-2 hover:bg-gray-100 rounded-t-xl"
-                  onClick={() => {
-                    alert("Estudiante seleccionado");
-                    setOpen(false);
-                  }}
-                >
-                  Estudiante
-                </button>
-              </li>
-              <li>
-                <button
-                  className="w-full text-left px-4 py-2 hover:bg-gray-100"
-                  onClick={() => {
-                    alert("Docente Editor seleccionado");
-                    setOpen(false);
-                  }}
-                >
-                  Docente Editor
-                </button>
-              </li>
-              <li>
-                <button
-                  className="w-full text-left px-4 py-2 hover:bg-gray-100 rounded-b-xl"
-                  onClick={() => {
-                    alert("Docente Ejecutador seleccionado");
-                    setOpen(false);
-                  }}
-                >
-                  Docente Ejecutador
-                </button>
-              </li>
+              {[
+                "Administrador",
+                "Estudiante",
+                "Docente Editor",
+                "Docente Ejecutador",
+              ].map((role) => (
+                <li key={role}>
+                  <button
+                    className={`w-full text-left px-4 py-2 hover:bg-gray-100 
+                        ${role === currentRole ? "text-[#017fb8] cursor-not-allowed" : ""}`}
+                    disabled={role === currentRole}
+                    onClick={() => {
+                      handleRoleChange(role);
+                    }}
+                  >
+                    {role}
+                  </button>
+                </li>
+              ))}
             </ul>
           </div>,
           document.body,
         )}
     </>
   );
-}
+};
+export default DROPDOWN_MENU;

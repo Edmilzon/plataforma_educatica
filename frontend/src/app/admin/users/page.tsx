@@ -8,7 +8,7 @@ import { useEffect, useState } from "react";
 
 import DropdownMenu from "@/app/components/DropdownMenu";
 import Navbar from "@/app/components/Navbar";
-import { getAllUsers } from "@/app/api/api";
+import { GET_USERS } from "@/app/api/api";
 
 type User = {
   id: string;
@@ -16,23 +16,25 @@ type User = {
   email: string;
   role: string;
 };
-
+/* eslint-disable max-lines-per-function*/
 const USERS = () => {
   const [users, setUsers] = useState<User[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
-  const [token, setToken] = useState<string | null>(null);
+  const [token, setToken] = useState("");
+  const [openMenuUserId, setOpenMenuUserId] = useState<string | null>(null);
 
   useEffect(() => {
     const storedToken = sessionStorage.getItem("token");
-    setToken(storedToken);
+    if (storedToken) {
+      setToken(storedToken);
+    }
   }, []);
 
   useEffect(() => {
     if (!token) return;
     const fetchUsers = async () => {
       try {
-        const data = await getAllUsers(token);
-        console.log("RESPUESTA BACKEND:", data);
+        const data = await GET_USERS(token);
         setUsers(
           data.map((u: any) => ({
             id: u.uuid_user,
@@ -54,6 +56,14 @@ const USERS = () => {
       user.email.toLowerCase().includes(searchTerm.toLowerCase()),
   );
 
+  const handleRoleUpdated = (userId: string, newRole: string) => {
+    setUsers((prevUsers) =>
+      prevUsers.map((user) =>
+        user.id === userId ? { ...user, role: newRole } : user,
+      ),
+    );
+  };
+
   return (
     <div>
       <Navbar />
@@ -70,6 +80,8 @@ const USERS = () => {
           <input
             className="w-full rounded-lg bg-[#f3f7f8] border py-3 pl-10 pr-4 focus:outline-none focus:ring-2 focus:ring-[#0099ae]"
             placeholder="Buscar por nombre..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
           />
         </div>
       </div>
@@ -130,7 +142,18 @@ const USERS = () => {
                     </span>
                   </td>
                   <td className="px-6 py-4 text-right">
-                    <DropdownMenu />
+                    <DropdownMenu
+                      currentRole={user.role}
+                      isOpen={openMenuUserId === user.id}
+                      token={token}
+                      userId={user.id}
+                      onRoleUpdated={handleRoleUpdated}
+                      onToggle={() =>
+                        setOpenMenuUserId(
+                          openMenuUserId === user.id ? null : user.id,
+                        )
+                      }
+                    />
                   </td>
                 </tr>
               ))}

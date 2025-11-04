@@ -5,23 +5,24 @@ export default withAuth(
   function middleware(req) {
     const token = req.nextauth.token;
     const isAuth = !!token;
-    const isAuthPage = req.nextUrl.pathname.startsWith('/auth');
-    const isAdminPage = req.nextUrl.pathname.startsWith('/admin');
-    const isDashboardPage = req.nextUrl.pathname.startsWith('/dashboard');
+    const isAuthPage = req.nextUrl.pathname.startsWith("/auth");
+    const isAdminPage = req.nextUrl.pathname.startsWith("/admin");
+    const isDashboardPage = req.nextUrl.pathname.startsWith("/dashboard");
     const path = req.nextUrl.pathname;
     //rutas publicas
-    const isPublicPage =path.startsWith("/user/login") || path.startsWith("/user/register");
-    
+    const isPublicPage =
+      path.startsWith("/user/login") || path.startsWith("/user/register");
+
     if (isAuthPage && isAuth) {
-      return NextResponse.redirect(new URL('/dashboard', req.url));
+      return NextResponse.redirect(new URL("/dashboard", req.url));
     }
     if (isAuth && isPublicPage) {
       return NextResponse.redirect(new URL("/dashboard", req.url));
     }
-   
+
     if (!isAuth && (isAdminPage || isDashboardPage)) {
       return NextResponse.redirect(
-        new URL(`/user/login?callbackURL=${req.nextUrl.pathname}`, req.url)
+        new URL(`/user/login?callbackURL=${req.nextUrl.pathname}`, req.url),
       );
     }
 
@@ -29,13 +30,13 @@ export default withAuth(
   },
   {
     callbacks: {
-      authorized: () => true, 
+      authorized: () => true,
     },
-  }
+  },
 );
 
 export const config = {
-   matcher: [
+  matcher: [
     "/dashboard/:path*",
     "/admin/:path*",
     "/user/home/:path*",
