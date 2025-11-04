@@ -69,9 +69,9 @@ describe('AuthService', () => {
       mockUserService.search_email.mockResolvedValue(user);
       (bcrypt.compare as jest.Mock).mockResolvedValue(true);
       mockJwtService.sign.mockReturnValue(token);
+      mockUserService.getProfile.mockResolvedValue(user);
 
       const result = await service.login(loginDto);
-      mockUserService.getProfile.mockResolvedValue(user);
 
       expect(userService.search_email).toHaveBeenCalledWith(loginDto.email);
       expect(bcrypt.compare).toHaveBeenCalledWith(
