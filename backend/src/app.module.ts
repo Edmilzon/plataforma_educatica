@@ -12,6 +12,7 @@ import { RoleEntity } from './user/entity/role.entity';
 import { RoleUserEntity } from './user/entity/role_user.entity';
 import { AuthModule } from './auth/auth.module';
 import { AdminModule } from './admin/admin.module';
+import { CourseModule } from './course/course.module';
 
 export const AppDataSourceOptions: DataSourceOptions = {
   type: 'postgres',
@@ -32,7 +33,8 @@ export const AppDataSourceOptions: DataSourceOptions = {
     UserModule,
     EmailModule,
     AuthModule,
-    AdminModule
+    AdminModule,
+    CourseModule
   ],
   controllers: [AppController],
   providers: [AppService],

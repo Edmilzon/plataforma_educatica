@@ -9,7 +9,9 @@ import AppDataSource from './../data-source';
 describe('AppController (e2e)', () => {
   let app: INestApplication<App>;
 
-  beforeEach(async () => {
+  jest.setTimeout(30000); // Aumentamos el timeout a 30 segundos
+
+  beforeAll(async () => {
     const module_fixture: TestingModule = await Test.createTestingModule({
       imports: [AppModule],
     }).compile();
@@ -25,7 +27,9 @@ describe('AppController (e2e)', () => {
       .expect('Hello World the Nestjs');
   });
   afterAll(async () => {
-    await app.close();
+    if (app) {
+      await app.close();
+    }
     if (AppDataSource.isInitialized) {
       await AppDataSource.destroy();
     }

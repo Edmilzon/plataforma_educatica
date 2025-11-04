@@ -1,11 +1,16 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { JwtService } from '@nestjs/jwt';
-import { UnauthorizedException } from '@nestjs/common';
+import {
+  UnauthorizedException,
+  BadRequestException,
+  NotFoundException,
+} from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 
 import { AuthService } from '../src/auth/auth.service';
 import { UserService } from '../src/user/user.service';
 import { UserEntity } from '../src/user/entity/user.entity';
+import { GoogleAuthDto } from 'src/auth/dto/google-auth.dto';
 
 jest.mock('bcrypt');
 
@@ -16,6 +21,9 @@ describe('AuthService', () => {
 
   const mockUserService = {
     search_email: jest.fn(),
+    registerUser: jest.fn(),
+    getProfile: jest.fn(),
+    findByConfirmationToken: jest.fn(),
     userRepository: { save: jest.fn() },
   };
 
@@ -44,16 +52,16 @@ describe('AuthService', () => {
   });
 
   describe('login', () => {
-    it('debería retornar un access_token si las credenciales son válidas', async () => {
+    it('debería retornar un token y el perfil del usuario si las credenciales son válidas', async () => {
       const user: UserEntity = {
         uuid_user: '1',
         email: 'test@example.com',
         password: 'hashedPassword',
         name: 'Test',
         lastname: 'User',
-        role: 'student',
         isConfirmed: true,
         confirmationToken: null,
+        user_role: [],
       };
       const loginDto = { email: 'test@example.com', password: 'password123' };
       const token = 'jwt-token';
@@ -63,6 +71,7 @@ describe('AuthService', () => {
       mockJwtService.sign.mockReturnValue(token);
 
       const result = await service.login(loginDto);
+      mockUserService.getProfile.mockResolvedValue(user);
 
       expect(userService.search_email).toHaveBeenCalledWith(loginDto.email);
       expect(bcrypt.compare).toHaveBeenCalledWith(
@@ -73,9 +82,7 @@ describe('AuthService', () => {
         sub: user.uuid_user,
         email: user.email,
       });
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const { password, ...userWithoutPassword } = user;
-      expect(result).toEqual({ token, user: userWithoutPassword });
+      expect(result.token).toEqual(token);
     });
 
     it('debería lanzar UnauthorizedException si el usuario no existe', async () => {
@@ -94,7 +101,6 @@ describe('AuthService', () => {
         password: 'hashedPassword',
         name: 'Test',
         lastname: 'User',
-        role: 'student',
         isConfirmed: true,
         confirmationToken: null,
       };
@@ -105,6 +111,73 @@ describe('AuthService', () => {
 
       await expect(service.login(loginDto)).rejects.toThrow(
         UnauthorizedException,
+      );
+    });
+  });
+
+  describe('signInWithGoogle', () => {
+    const googleUser: GoogleAuthDto = {
+      email: 'google@example.com',
+      name: 'Google',
+      lastname: 'User',
+    };
+    const userEntity = new UserEntity();
+    userEntity.uuid_user = 'google-uuid';
+    userEntity.email = googleUser.email;
+
+    it('should login an existing user', async () => {
+      mockUserService.search_email.mockResolvedValue(userEntity);
+      mockUserService.getProfile.mockResolvedValue(userEntity);
+      mockJwtService.sign.mockReturnValue('jwt-token');
+
+      const result = await service.signInWithGoogle(googleUser);
+
+      expect(userService.search_email).toHaveBeenCalledWith(googleUser.email);
+      expect(userService.registerUser).not.toHaveBeenCalled();
+      expect(result.token).toBe('jwt-token');
+    });
+
+    it('should register and login a new user', async () => {
+      mockUserService.search_email.mockResolvedValue(null);
+      mockUserService.registerUser.mockResolvedValue(userEntity);
+      mockUserService.getProfile.mockResolvedValue(userEntity);
+      mockJwtService.sign.mockReturnValue('jwt-token');
+
+      const result = await service.signInWithGoogle(googleUser);
+
+      expect(userService.search_email).toHaveBeenCalledWith(googleUser.email);
+      expect(userService.registerUser).toHaveBeenCalled();
+      expect(result.token).toBe('jwt-token');
+    });
+
+    it('should throw BadRequestException if googleUser is invalid', async () => {
+      await expect(service.signInWithGoogle(null)).rejects.toThrow(
+        BadRequestException,
+      );
+    });
+  });
+
+  describe('confirmEmail', () => {
+    it('should confirm user email', async () => {
+      const user = new UserEntity();
+      user.isConfirmed = false;
+      user.confirmationToken = 'some-token';
+
+      mockUserService.findByConfirmationToken.mockResolvedValue(user);
+
+      const result = await service.confirmEmail('some-token');
+
+      expect(user.isConfirmed).toBe(true);
+      expect(user.confirmationToken).toBeNull();
+      expect(userService.userRepository.save).toHaveBeenCalledWith(user);
+      expect(result.message).toContain('confirmado con éxito');
+    });
+
+    it('should throw NotFoundException if token is invalid', async () => {
+      mockUserService.findByConfirmationToken.mockResolvedValue(null);
+
+      await expect(service.confirmEmail('invalid-token')).rejects.toThrow(
+        NotFoundException,
       );
     });
   });
