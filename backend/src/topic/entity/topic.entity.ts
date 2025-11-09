@@ -4,9 +4,11 @@ import {
     PrimaryGeneratedColumn,
     ManyToOne,
     JoinColumn,
+    OneToMany,
 } from 'typeorm';
 
 import { CourseEntity } from '../../course/entity/course.entity';
+import { LessonEntity } from 'src/lesson/entity/lesson.entity';
 
 @Entity('topic')
 export class TopicEntity {
@@ -25,4 +27,7 @@ export class TopicEntity {
     })
     @JoinColumn({ name: 'course_uuid' })
     course: CourseEntity;
+
+    @OneToMany(() => LessonEntity, (lesson) => lesson.topic, {cascade: true})
+    lessons: LessonEntity[];
 }
