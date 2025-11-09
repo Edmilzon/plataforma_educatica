@@ -1,37 +1,49 @@
 "use client";
-import { useState } from "react";
-import { FaEdit, FaRegTrashAlt } from "react-icons/fa";
+import { useState, useEffect } from "react";
 
 import Navbar from "@/app/components/Navbar";
-import { CREATE_CURSO } from "@/app/api/api";
+import { CREATE_CURSO, GET_CURSOS } from "@/app/api/api";
 
-type Resource = {
-  type: "video" | "slides" | "image" | "text" | "transcription";
-  content: string;
-};
-
-type Lesson = {
+type Course = {
   id: string;
   title: string;
   description: string;
-  resources: Resource[];
 };
-
-type Module = {
-  id: string;
-  title: string;
-  description: string;
-  lessons: Lesson[];
-};
-/* eslint-disable max-lines-per-function, complexity */
+/* eslint-disable max-lines-per-function, complexity, @typescript-eslint/no-explicit-any */
 const CREATE_COURSE = () => {
-  const [modules, setModules] = useState<Module[]>([]);
-  const [isAddingModule, setIsAddingModule] = useState(false);
-  const [newModule, setNewModule] = useState({ title: "", description: "" });
-  const [editingModule, setEditingModule] = useState<string | null>(null);
+  const [courses, setCourses] = useState<Course[]>([]);
+  const [isAddingCourse, setIsAddingCourse] = useState(false);
+  const [newCourse, setNewCourse] = useState({ title: "", description: "" });
 
-  const handleAddModule = async () => {
-    if (newModule.title.trim()) {
+  useEffect(() => {
+    const fetchCourses = async () => {
+      try {
+        const token = sessionStorage.getItem("token");
+        if (!token) {
+          alert("No se encontró el token de autenticación.");
+          return;
+        }
+
+        const data = await GET_CURSOS(token);
+        console.log("Cursos obtenidos:", data);
+
+        const mappedCourses = data.map((course: any) => ({
+          id: course.uuid_course,
+          title: course.title,
+          description: course.description,
+        }));
+
+        setCourses(mappedCourses);
+      } catch (error) {
+        console.error("Error al obtener cursos:", error);
+      }
+    };
+
+    fetchCourses();
+  }, []);
+
+  const handleAddCourse = async () => {
+    if (newCourse.title.trim() && newCourse.description.trim()) {
       try {
         const token = sessionStorage.getItem("token");
         if (!token) {
@@ -41,32 +53,30 @@ const CREATE_COURSE = () => {
 
         const response = await CREATE_CURSO(
           token,
-          newModule.title,
-          newModule.description,
+          newCourse.title,
+          newCourse.description,
         );
 
         console.log("Curso creado correctamente:", response);
 
-        const newCourse: Module = {
-          id: response.id?.toString() || Date.now().toString(),
-          title: newModule.title,
-          description: newModule.description,
-          lessons: [],
+        const createdCourse: Course = {
+          id:
+            response.uuid_course ||
+            response.id?.toString() ||
+            Date.now().toString(),
+          title: newCourse.title,
+          description: newCourse.description,
         };
 
-        setModules([...modules, newCourse]);
-        setNewModule({ title: "", description: "" });
-        setIsAddingModule(false);
+        setCourses([...courses, createdCourse]);
+        setNewCourse({ title: "", description: "" });
+        setIsAddingCourse(false);
       } catch (error) {
         console.error("Error al crear el curso:", error);
         alert("Error al crear el curso. Ver consola para más detalles.");
       }
-    }
-  };
-
-  const handleDeleteModule = (moduleId: string) => {
-    if (confirm("¿Estás seguro de que deseas eliminar este tópico?")) {
-      setModules(modules.filter((m) => m.id !== moduleId));
+    } else {
+      alert("Por favor completa todos los campos.");
     }
   };
 
@@ -74,42 +84,24 @@ const CREATE_COURSE = () => {
     <div>
       <Navbar />
       <div className="mx-10 my-4">
-        <h1 className="font-bold text-3xl">Gestión del curso</h1>
+        <h1 className="font-bold text-3xl">Gestiona versiones del curso </h1>
         <p className="text-[#737373]">
-          Gestiona el contenido del curso de Python
+          {" "}
+          Crea y gestiona las versiones de los cursos de la plataforma{" "}
         </p>
       </div>
       <div className="mx-10 my-4">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <div className="rounded-xl border bg-card p-6 shadow-sm">
-            <p className="text-sm text-muted-foreground mb-2">Total Tópicos</p>
-            <p className="text-4xl font-bold text-foreground">1</p>
-          </div>
-          <div className="rounded-xl border bg-card p-6 shadow-sm">
-            <p className="text-sm text-muted-foreground mb-2">
-              Total Lecciones
-            </p>
-            <p className="text-4xl font-bold text-foreground">0</p>
-          </div>
-          <div className="rounded-xl border bg-card p-6 shadow-sm">
-            <p className="text-sm text-muted-foreground mb-2">Total Recursos</p>
-            <p className="text-4xl font-bold text-foreground">0</p>
-          </div>
-        </div>
-      </div>
-
-      <div className="mx-10 my-4">
-        {!isAddingModule ? (
+        {!isAddingCourse ? (
           <button
             className="bg-[#0098af] hover:bg-[#19a2b6] px-4 py-2 rounded-4xl text-white transition cursor-pointer"
-            onClick={() => setIsAddingModule(true)}
+            onClick={() => setIsAddingCourse(true)}
           >
-            Agregar Tópico
+            Crear Nuevo Curso
           </button>
         ) : (
           <div className="rounded-xl border bg-card p-6 shadow-sm">
             <h3 className="text-lg font-semibold text-foreground mb-4">
-              Nuevo Tópico
+              Nuevo Curso
             </h3>
             <div className="space-y-4">
               <div>
@@ -117,11 +109,11 @@ const CREATE_COURSE = () => {
                   Título
                 </label>
                 <input
-                  className="w-full rounded-lg bg-[#f3f7f8] border py-3 pl-10 pr-4 focus:outline-none focus:ring-2 focus:ring-[#0099ae]"
+                  className="w-full rounded-lg bg-[#f3f7f8] border py-3 px-4 focus:outline-none focus:ring-2 focus:ring-[#0099ae]"
                   placeholder="Ej: Introducción a Python"
-                  value={newModule.title}
+                  value={newCourse.title}
                   onChange={(e) =>
-                    setNewModule({ ...newModule, title: e.target.value })
+                    setNewCourse({ ...newCourse, title: e.target.value })
                   }
                 />
               </div>
@@ -130,23 +122,23 @@ const CREATE_COURSE = () => {
                   Descripción
                 </label>
                 <textarea
-                  className="w-full rounded-lg bg-[#f3f7f8] border py-3 pl-10 pr-4 focus:outline-none focus:ring-2 focus:ring-[#0099ae]"
-                  placeholder="Describe el tópico..."
+                  className="w-full rounded-lg bg-[#f3f7f8] border py-3 px-4 focus:outline-none focus:ring-2 focus:ring-[#0099ae]"
+                  placeholder="Describe el curso..."
                   rows={3}
-                  value={newModule.description}
+                  value={newCourse.description}
                   onChange={(e) =>
-                    setNewModule({ ...newModule, description: e.target.value })
+                    setNewCourse({ ...newCourse, description: e.target.value })
                   }
                 />
               </div>
               <div className="flex gap-2">
                 <button
                   className="bg-[#0098af] hover:bg-[#19a2b6] px-4 py-2 rounded-4xl text-white transition cursor-pointer"
-                  onClick={handleAddModule}
+                  onClick={handleAddCourse}
                 >
                   Guardar
                 </button>
-                <button onClick={() => setIsAddingModule(false)}>
+                <button onClick={() => setIsAddingCourse(false)}>
                   Cancelar
                 </button>
               </div>
@@ -154,86 +146,30 @@ const CREATE_COURSE = () => {
           </div>
         )}
       </div>
-
-      <div className="space-y-4 mx-10">
-        {modules.map((module, moduleIndex) => (
-          <div className="rounded-xl border bg-card shadow-sm" key={module.id}>
-            <div className="p-6">
-              <div className="flex items-start justify-between">
-                <div className="flex-1">
-                  <div className="flex items-center gap-3 mb-2">
-                    <span className="text-sm font-medium text-muted-foreground">
-                      Tópico {moduleIndex + 1}
-                    </span>
-                    <span className="text-sm text-muted-foreground">
-                      # lecciones
-                    </span>
-                  </div>
-                  {editingModule === module.id ? (
-                    <div className="space-y-3">
-                      <input
-                        value={module.title}
-                        onChange={(e) =>
-                          setModules(
-                            modules.map((m) =>
-                              m.id === module.id
-                                ? { ...m, title: e.target.value }
-                                : m,
-                            ),
-                          )
-                        }
-                      />
-                      <textarea
-                        rows={2}
-                        value={module.description}
-                        onChange={(e) =>
-                          setModules(
-                            modules.map((m) =>
-                              m.id === module.id
-                                ? { ...m, description: e.target.value }
-                                : m,
-                            ),
-                          )
-                        }
-                      />
-                      <div className="flex gap-2">
-                        <button
-                          className="bg-primary hover:bg-primary/90 text-primary-foreground"
-                          onClick={() => setEditingModule(null)}
-                        >
-                          Guardar
-                        </button>
-                        <button onClick={() => setEditingModule(null)}>
-                          Cancelar
-                        </button>
-                      </div>
-                    </div>
-                  ) : (
-                    <>
-                      <h3 className="text-xl font-bold text-foreground mb-1">
-                        {module.title}
-                      </h3>
-                      <p className="text-muted-foreground">
-                        {module.description}
-                      </p>
-                    </>
-                  )}
-                </div>
-                <div className="flex items-center gap-2 ml-4">
-                  <button className="text-primary hover:text-primary">
-                    <FaEdit className="h-4 w-4" />
-                  </button>
-                  <button
-                    className="text-destructive hover:text-destructive"
-                    onClick={() => handleDeleteModule(module.id)}
-                  >
-                    <FaRegTrashAlt className="h-4 w-4" />
-                  </button>
-                </div>
+      {/* MOSTRAR CURSOS */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mx-10 mt-8">
+        {courses.length === 0 ? (
+          <p className="text-gray-500 text-center col-span-3">
+            No hay cursos creados aún.
+          </p>
+        ) : (
+          courses.map((course) => (
+            <div
+              className="rounded-xl border bg-white p-6 shadow-sm flex flex-col justify-between"
+              key={course.id}
+            >
+              <div>
+                <h2 className="font-bold text-xl mb-2">{course.title}</h2>
+                <p className="text-[#737373] mb-4">{course.description}</p>
+              </div>
+              <div className="flex items-center justify-between border-t pt-3">
+                <button className="bg-[#e8f7f9] text-[#0098af] text-sm px-3 py-1 rounded-md hover:bg-[#d2eff3] transition">
+                  Agregar Topicos
+                </button>
               </div>
             </div>
-          </div>
-        ))}
+          ))
+        )}
       </div>
     </div>
   );

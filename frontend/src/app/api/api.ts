@@ -138,3 +138,20 @@ export const CREATE_CURSO = async (
     throw error;
   }
 };
+
+export const GET_CURSOS = async (token: string) => {
+  try {
+    const res = await fetch("http://127.0.0.1:5000/course", {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    if (!res.ok) throw new Error("Error al obtener los cursos");
+    return await res.json();
+  } catch (error) {
+    console.error("Error en GET_CURSOS:", error);
+    throw error;
+  }
+};
