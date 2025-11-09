@@ -1,12 +1,15 @@
+
 import {
   Column,
   Entity,
   PrimaryGeneratedColumn,
   ManyToOne,
   JoinColumn,
+  OneToMany,
 } from 'typeorm';
 
 import { UserEntity } from '../../user/entity/user.entity';
+import { TopicEntity } from '../../topic/entity/topic.entity';
 
 @Entity('course')
 export class CourseEntity {
@@ -22,4 +25,7 @@ export class CourseEntity {
   @ManyToOne(() => UserEntity, { eager: true })
   @JoinColumn({ name: 'creator_uuid' })
   creator: UserEntity;
+
+  @OneToMany(() => TopicEntity, (topic) => topic.course, { cascade: true })
+  topics: TopicEntity[];
 }
