@@ -1,12 +1,14 @@
 @hostname = http://localhost:5000
 
 
-### Crear un nuevo topico para un curso
-POST {{hostname}}/topic
+### Crear una nueva leccion para un topico
+POST {{hostname}}/lesson
 Content-Type: application/json
 
 {
-  "title": "Introducción a NestJS",
+  "title": "Historia de python",
   "order": 1,
-  "course_uuid": "aee6e53e-5354-40fc-9cb1-e401e61b05e6"
+  "description": "Historia desde el inicio y la creaciond de python",
+  "resource_url": "https://pruebita.com",
+  "topic_uuid": "c0916232-dd37-4ed0-bc57-e484ac5bd597"
 }
