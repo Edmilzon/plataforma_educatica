@@ -1,12 +1,27 @@
 @hostname = http://localhost:5000
+@token = 
+@course_uuid = aee6e53e-5354-40fc-9cb1-e401e61b05e6
+@topic_uuid = 
 
-
-### Crear un nuevo topico para un curso
+### Crear un nuevo topico para un curso 
 POST {{hostname}}/topic
 Content-Type: application/json
+Authorization: Bearer {{@token}}
 
 {
   "name": "Introducción a NestJS",
   "orden": 1,
-  "course_uuid": "aee6e53e-5354-40fc-9cb1-e401e61b05e6"
+  "course_uuid": "{{course_uuid}}"
 }
+
+### Mostrar todos los topicos
+GET {{hostname}}/topic
+Authorization: Bearer {{@token}}
+
+### Mostrar todos los tópicos de un curso
+GET {{hostname}}/topic/course/{{course_uuid}}
+Authorization: Bearer {{@token}}
+
+### Mostrar un tópico en base al uuid
+GET {{hostname}}/topic/{{topic_uuid}}
+Authorization: Bearer {{@token}}

@@ -35,4 +35,11 @@ export class LessonService {
 
         return this.lessonRepository.save(newLesson);
     }
+
+    async findLessonsByTopic(topic_uuid: string): Promise<LessonEntity[]> {
+        return this.lessonRepository.find({
+            where: { topic: { uuid_topic: topic_uuid}},
+            order: { order: 'ASC'}
+        })
+    }
 }
