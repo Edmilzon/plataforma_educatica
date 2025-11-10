@@ -1,5 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { InjectRepository }s from '@nestjs/typeorm';
+import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { TopicEntity } from './entity/topic.entity';
 import { CreateTopicDto } from './dto/topic.dto';

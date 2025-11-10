@@ -1,0 +1,12 @@
+@hostname = http://localhost:5000
+
+
+### Crear un nuevo topico para un curso
+POST {{hostname}}/topic
+Content-Type: application/json
+
+{
+  "title": "Introducción a NestJS",
+  "order": 1,
+  "course_uuid": "aee6e53e-5354-40fc-9cb1-e401e61b05e6"
+}
