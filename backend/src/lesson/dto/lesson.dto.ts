@@ -1,23 +1,24 @@
-import { IsNotEmpty, IsString, IsUUID } from "class-validator";
+import { PartialType } from '@nestjs/mapped-types';
+import { IsNotEmpty, IsString, IsUUID } from 'class-validator';
 
-export class LessonDto {
-    @IsString()
-    @IsNotEmpty()
-    title: string;
+export class CreateLessonDto {
+  @IsString()
+  @IsNotEmpty()
+  title: string;
 
-    @IsNotEmpty()
-    order: number;
+  @IsNotEmpty()
+  order: number;
 
+  @IsString()
+  @IsNotEmpty()
+  description: string;
 
-    @IsString()
-    @IsNotEmpty()
-    description: string;
+  @IsString()
+  resource_url: string;
 
-    @IsString()
-    @IsNotEmpty()
-    resource_url: string;
-
-    @IsUUID()
-    topic_uuid: string;
-
+  @IsUUID()
+  @IsNotEmpty()
+  topic_uuid: string;
 }
+
+export class UpdateLessonDto extends PartialType(CreateLessonDto) {}

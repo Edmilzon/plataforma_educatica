@@ -25,3 +25,17 @@ Authorization: Bearer {{@token}}
 ### Mostrar un tópico en base al uuid
 GET {{hostname}}/topic/{{topic_uuid}}
 Authorization: Bearer {{@token}}
+
+### Actualizar un tópico en base al uuid
+PATCH {{hostname}}/topic/{{topic_uuid}}
+Content-Type: application/json
+Authorization: Bearer {{@token}}
+
+{
+  "name": "Introducción a NestJS - Actualizado",
+  "orden": 1
+}
+
+### Eliminar un tópico en base al uuid
+DELETE {{hostname}}/topic/{{topic_uuid}}
+Authorization: Bearer {{@token}}

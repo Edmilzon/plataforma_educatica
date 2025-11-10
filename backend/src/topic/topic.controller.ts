@@ -10,6 +10,7 @@ import {
   Delete,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
+
 import { TopicService } from './topic.service';
 import { CreateTopicDto, UpdateTopicDto } from './dto/topic.dto';
 import { RolesGuard } from '../auth/guards/roles.guard';
@@ -53,7 +54,7 @@ export class TopicController {
   }
 
   @Delete(':uuid')
-  @Roles(Role.ADMIN, Role-PROFESOR_CREADOR)
+  @Roles(Role.ADMIN, Role.PROFESOR_CREADOR)
   remove(@Param('uuid', ParseUUIDPipe) uuid: string) {
     return this.topicService.remove(uuid);
   }
