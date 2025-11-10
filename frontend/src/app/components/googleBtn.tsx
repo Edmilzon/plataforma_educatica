@@ -4,7 +4,7 @@ import { FcGoogle } from "react-icons/fc";
 
 const BUTTON_BTN = () => {
   const HandleClick = async () => {
-    signIn("google", { callbackUrl: "/user/home" });
+    signIn("google", { callbackUrl: "/dashboard" });
   };
   return (
     <div className="flex gap-4">

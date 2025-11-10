@@ -5,6 +5,7 @@ import {
   MdOutlinePersonSearch,
 } from "react-icons/md";
 import { useEffect, useState } from "react";
+import { useSession } from "next-auth/react";
 
 import DropdownMenu from "@/app/components/DropdownMenu";
 import Navbar from "@/app/components/Navbar";
@@ -22,13 +23,13 @@ const USERS = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [token, setToken] = useState("");
   const [openMenuUserId, setOpenMenuUserId] = useState<string | null>(null);
-
+  const { data: session } = useSession();
   useEffect(() => {
-    const storedToken = sessionStorage.getItem("token");
-    if (storedToken) {
-      setToken(storedToken);
+    if (session?.accessToken) {
+      //console.log(session.accessToken);
+      setToken(session.accessToken);
     }
-  }, []);
+  }, [session]);
 
   useEffect(() => {
     if (!token) return;

@@ -8,6 +8,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { LuEye, LuEyeClosed } from "react-icons/lu";
 import { signIn } from "next-auth/react";
+import { getSession } from "next-auth/react";
 
 //import { FcGoogle } from "react-icons/fc";
 //import { LOGIN_USER } from "@/app/api/api";
@@ -31,7 +32,6 @@ const LOGIN_PAGE = () => {
   const [show_password, set_show_password] = useState(false);
   const [loading, set_loading] = useState(false);
   const [error, set_error] = useState("");
-
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (token) router.push("/user/home");
@@ -41,6 +41,7 @@ const LOGIN_PAGE = () => {
     set_loading(true);
     set_error("");
 
+    // Iniciar sesión con credenciales
     const result = await signIn("credentials", {
       redirect: false,
       email: data.email,
@@ -49,13 +50,32 @@ const LOGIN_PAGE = () => {
 
     if (result?.error) {
       set_error("Usuario o contraseña incorrectos");
-    } else {
-      window.location.href = "/user/home";
+      set_loading(false);
+      return;
     }
 
+    //  Esperar que la sesión se actualice y obtenerla
+    const session = await getSession();
+
+    if (!session) {
+      set_error("No se pudo obtener la sesión");
+      set_loading(false);
+      return;
+    }
+
+    //  Leer los roles de forma segura
+    const roles: string[] =
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (session as any)?.userData?.user_role?.map((r: any) => r.role.name) || [];
+
+    //  Redirección según el rol
+    if (roles.includes("administrador")) {
+      window.location.href = "/admin/curso";
+    } else {
+      window.location.href = "/dashboard";
+    }
     set_loading(false);
   };
-
   return (
     <div className="min-h-screen flex flex-col md:flex-row">
       <div className="md:w-1/2 w-full flex items-center justify-center bg-[#f5f6f8]">

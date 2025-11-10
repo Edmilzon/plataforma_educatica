@@ -1,10 +1,10 @@
 "use client";
 import { useState } from "react";
 import { FaEdit, FaRegTrashAlt } from "react-icons/fa";
+import { useSession } from "next-auth/react";
 
 import Navbar from "@/app/components/Navbar";
 import { CREATE_CURSO } from "@/app/api/api";
-
 type Resource = {
   type: "video" | "slides" | "image" | "text" | "transcription";
   content: string;
@@ -29,11 +29,15 @@ const CREATE_COURSE = () => {
   const [isAddingModule, setIsAddingModule] = useState(false);
   const [newModule, setNewModule] = useState({ title: "", description: "" });
   const [editingModule, setEditingModule] = useState<string | null>(null);
-
+  const { data: session } = useSession();
   const handleAddModule = async () => {
     if (newModule.title.trim()) {
       try {
-        const token = sessionStorage.getItem("token");
+        let token: string | undefined;
+        if (session?.accessToken) {
+          token = session.accessToken;
+          //console.log(token + "maaaaaaaaaaaaatate");
+        }
         if (!token) {
           alert("No se encontró el token de autenticación.");
           return;

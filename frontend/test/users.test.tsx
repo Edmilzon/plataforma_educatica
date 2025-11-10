@@ -4,7 +4,7 @@ import React from "react";
 import { SessionProvider } from "next-auth/react";
 
 import USERS from "../src/app/admin/users/page";
-import * as api from "../src/app/api/api"; // Importamos las funciones de la API
+import * as api from "../src/app/api/api";
 
 // Mock de la API GET_USERS
 jest.mock("../src/app/api/api", () => ({
@@ -17,9 +17,11 @@ jest.mock("next/navigation", () => ({
     prefetch: jest.fn(),
   }),
 }));
+
+// Mock de componentes internos
 /* eslint-disable react/display-name */
 jest.mock("../src/app/components/Navbar", () => () => <div>Navbar Mock</div>);
-/* eslint-disable react/display-name */
+
 jest.mock("../src/app/components/DropdownMenu", () => (props: any) => (
   <div data-testid={`dropdown-${props.userId}`}>Dropdown Mock</div>
 ));
@@ -49,16 +51,27 @@ describe("USERS component", () => {
       },
     ]);
 
+    // Mock de sesión activa
+    const mockSession = {
+      user: { name: "Admin Test", email: "admin@test.com" },
+      accessToken: "mock-token",
+      userData: {
+        user_role: [{ role: { name: "administrador" } }],
+      },
+    };
+
     render(
-      <SessionProvider session={null}>
+      <SessionProvider session={mockSession}>
         <USERS />
       </SessionProvider>,
     );
 
+    // Verificar que el buscador se renderiza
     expect(
       screen.getByPlaceholderText("Buscar por nombre..."),
     ).toBeInTheDocument();
 
+    // Esperar a que los datos de usuarios se muestren
     await waitFor(() => {
       expect(screen.getByText("Juan Perez")).toBeInTheDocument();
       expect(screen.getByText("Maria Lopez")).toBeInTheDocument();

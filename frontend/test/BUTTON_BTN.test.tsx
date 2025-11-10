@@ -28,7 +28,7 @@ describe("BUTTON_BTN component", () => {
     fireEvent.click(button);
 
     expect(signIn).toHaveBeenCalledWith("google", {
-      callbackUrl: "/user/home",
+      callbackUrl: "/dashboard",
     });
   });
 });

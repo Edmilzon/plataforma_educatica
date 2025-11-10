@@ -1,5 +1,7 @@
 import Image from "next/image";
 import { useEffect, useState } from "react";
+import { useSession } from "next-auth/react";
+
 type User = {
   uuid_user: string;
   email: string;
@@ -11,13 +13,14 @@ type User = {
 };
 const HEROSECTION = () => {
   const [user, setUser] = useState<User | null>(null);
+  const { data: session } = useSession();
 
   useEffect(() => {
-    const storedUser = sessionStorage.getItem("user");
-    if (storedUser) {
-      setUser(JSON.parse(storedUser));
+    if (session) {
+      // <-- validamos que session no sea null
+      setUser(session.userData); // o session.userData si lo tienes personalizado
     }
-  }, []);
+  }, [session]);
 
   if (!user) return <p>No hay usuario logueado</p>;
   return (
