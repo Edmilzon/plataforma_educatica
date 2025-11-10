@@ -1,8 +1,11 @@
 "use client";
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { FaRegTrashAlt } from "react-icons/fa";
 
 import Navbar from "@/app/components/Navbar";
-import { CREATE_CURSO, GET_CURSOS } from "@/app/api/api";
+import { CREATE_CURSO, GET_CURSOS } from "@/app/api/apiAdmin";
+import Toast from "@/app/components/ModalError";
 
 type Course = {
   id: string;
@@ -11,9 +14,25 @@ type Course = {
 };
 /* eslint-disable max-lines-per-function, complexity, @typescript-eslint/no-explicit-any */
 const CREATE_COURSE = () => {
+  const router = useRouter();
   const [courses, setCourses] = useState<Course[]>([]);
   const [isAddingCourse, setIsAddingCourse] = useState(false);
   const [newCourse, setNewCourse] = useState({ title: "", description: "" });
+  const [toast, set_toast] = useState<{
+    message: string;
+    type: "error" | "success" | "warning" | "info";
+    visible: boolean;
+  }>({
+    message: "",
+    type: "info",
+    visible: false,
+  });
+  const show_toast = (
+    message: string,
+    type: "error" | "success" | "warning" | "info",
+  ) => {
+    set_toast({ message, type, visible: true });
+  };
 
   useEffect(() => {
     const fetchCourses = async () => {
@@ -58,7 +77,7 @@ const CREATE_COURSE = () => {
         );
 
         console.log("Curso creado correctamente:", response);
-
+        show_toast("Curso creado correctamente:", "success");
         const createdCourse: Course = {
           id:
             response.uuid_course ||
@@ -147,7 +166,7 @@ const CREATE_COURSE = () => {
         )}
       </div>
       {/* MOSTRAR CURSOS */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mx-10 mt-8">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mx-10 mt-8 pb-2">
         {courses.length === 0 ? (
           <p className="text-gray-500 text-center col-span-3">
             No hay cursos creados aún.
@@ -162,15 +181,29 @@ const CREATE_COURSE = () => {
                 <h2 className="font-bold text-xl mb-2">{course.title}</h2>
                 <p className="text-[#737373] mb-4">{course.description}</p>
               </div>
+
               <div className="flex items-center justify-between border-t pt-3">
-                <button className="bg-[#e8f7f9] text-[#0098af] text-sm px-3 py-1 rounded-md hover:bg-[#d2eff3] transition">
+                <button
+                  className="bg-[#e8f7f9] text-[#0098af] text-sm px-3 py-1 rounded-md hover:bg-[#d2eff3] transition"
+                  onClick={() => router.push(`/admin/topico/${course.id}`)}
+                >
                   Agregar Topicos
+                </button>
+                <button className="text-red-500 hover:text-red-700 pr-4">
+                  <FaRegTrashAlt className="h-4 w-4" />
                 </button>
               </div>
             </div>
           ))
         )}
       </div>
+      {toast.visible && (
+        <Toast
+          message={toast.message}
+          type={toast.type}
+          onClose={() => set_toast({ ...toast, visible: false })}
+        />
+      )}
     </div>
   );
 };

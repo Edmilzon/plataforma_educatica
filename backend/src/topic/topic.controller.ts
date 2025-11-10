@@ -53,7 +53,7 @@ export class TopicController {
   }
 
   @Delete(':uuid')
-  @Roles(Role.ADMIN, Role-PROFESOR_CREADOR)
+  @Roles(Role.ADMIN, Role.PROFESOR_CREADOR)
   remove(@Param('uuid', ParseUUIDPipe) uuid: string) {
     return this.topicService.remove(uuid);
   }
