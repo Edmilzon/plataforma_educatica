@@ -12,8 +12,9 @@ import { useSession } from "next-auth/react";
 import Navbar from "@/app/components/Navbar";
 import { CREATE_TOPIC, GET_TOPICS_BY_COURSE } from "@/app/api/apiAdmin";
 import LESSON from "@/app/components/Lesson";
+
 type Topic = {
-  uuid: string;
+  uuid_topic: string;
   name: string;
   orden: number;
 };
@@ -25,39 +26,37 @@ type CreateTopicRequest = {
 };
 /* eslint-disable max-lines-per-function, complexity */
 const TOPIC = () => {
-  const { course_uuid } = useParams(); // Obtiene el UUID del curso desde la URL
+  const { course_uuid } = useParams();
   const [topics, setTopics] = useState<Topic[]>([]);
   const [isAdding, setIsAdding] = useState(false);
   const [newTopic, setNewTopic] = useState({ name: "", orden: "" });
-  /* eslint-disable @typescript-eslint/no-unused-vars */
-  const [token, setToken] = useState("");
   const { data: session } = useSession();
+  const [token, setToken] = useState("");
   const [openLessonModal, setOpenLessonModal] = useState(false);
   const [expandedTopic, setExpandedTopic] = useState<string[]>(["1"]);
+  const [selectedTopicId, setSelectedTopicId] = useState<string | null>(null);
+
+  // Guardar token
   useEffect(() => {
     if (session?.accessToken) {
       setToken(session.accessToken);
     }
   }, [session]);
 
+  // Traer tópicos
   useEffect(() => {
     const fetchTopics = async () => {
+      if (!session?.accessToken) return;
       try {
-        if (!session?.accessToken) {
-          console.warn("No hay sesión activa o token no disponible.");
-          return;
-        }
         const data = await GET_TOPICS_BY_COURSE(
           session.accessToken,
           course_uuid as string,
         );
-        console.log("Tópicos obtenidos:", data);
         setTopics(data);
       } catch (error) {
         console.error("Error al obtener los tópicos:", error);
       }
     };
-
     if (session && course_uuid) fetchTopics();
   }, [session, course_uuid]);
 
@@ -67,16 +66,12 @@ const TOPIC = () => {
       return;
     }
 
-    try {
-      let token: string | undefined;
-      if (session?.accessToken) {
-        token = session.accessToken;
-      }
-      if (!token) {
-        alert("No se encontró el token de autenticación.");
-        return;
-      }
+    if (!token) {
+      alert("No se encontró el token de autenticación.");
+      return;
+    }
 
+    try {
       const topicData: CreateTopicRequest = {
         name: newTopic.name,
         orden: parseInt(newTopic.orden, 10),
@@ -84,10 +79,8 @@ const TOPIC = () => {
       };
 
       const response = await CREATE_TOPIC(token, topicData);
-      console.log("Tópico creado correctamente:", response);
-
       const newItem: Topic = {
-        uuid: response.uuid || Date.now().toString(),
+        uuid_topic: response.uuid || Date.now().toString(),
         name: newTopic.name,
         orden: parseInt(newTopic.orden, 10),
       };
@@ -107,6 +100,12 @@ const TOPIC = () => {
         : [...prev, moduleId],
     );
   };
+
+  const handleOpenLessonModal = (uuid: string) => {
+    setSelectedTopicId(uuid); // Guardamos el ID del tópico
+    setOpenLessonModal(true); // Abrimos el modal
+  };
+
   return (
     <div>
       <Navbar />
@@ -117,7 +116,7 @@ const TOPIC = () => {
         </p>
       </div>
 
-      {/* FORMULARIO*/}
+      {/* FORMULARIO */}
       <div className="mx-10 my-4">
         {!isAdding ? (
           <button
@@ -173,58 +172,60 @@ const TOPIC = () => {
         )}
       </div>
 
-      {/*LISRAR TOPICOS*/}
-      <div className="space-y-4 mx-10 mb-10 ">
+      {/* LISTAR TOPICOS */}
+      <div className="space-y-4 mx-10 mb-10">
         {topics.length === 0 ? (
           <p className="text-gray-500">No hay tópicos creados aún.</p>
         ) : (
           topics.map((topic, index) => (
             <div
               className="rounded-xl border bg-white shadow-sm p-6 flex justify-between items-center"
-              key={topic.uuid || index}
+              key={topic.uuid_topic || index}
             >
-              <div className="p-6 flex justify-between items-center">
-              <div >
-                <p className="text-sm text-gray-500 mb-1">
-                  Tópico {topic.orden}
-                </p>
-                <h3 className="text-xl font-bold">{topic.name}</h3>
-              </div>
-              <div className="flex gap-2">
-                <button className="text-primary hover:text-primary">
-                  <FaEdit className="h-4 w-4" />
-                </button>
-                <button className="text-red-500 hover:text-red-700">
-                  <FaRegTrashAlt className="h-4 w-4" />
-                </button>
-                <button onClick={() => toggleLesson(topic.uuid)}>
-                  {expandedTopic.includes(topic.uuid) ? (
-                    <FaChevronDown />
-                  ) : (
-                    <FaChevronUp />
-                  )}
-                </button>
-              </div>
-            </div>
-                {expandedTopic.includes(topic.uuid) && (
-                  <div className="border-t bg-[#f9f9f9] p-4 rounded-b-xl">
-                    <div className=" py-4">
-                  <button 
-                  onClick={() => setOpenLessonModal(true)}
-                  className="flex items-center gap-2 text-[#0098af] hover:text-[#007d91] font-medium">
-                    <span className="text-lg">+</span> Agregar Lección
+              <div className="p-6 flex justify-between items-center w-full">
+                <div>
+                  <p className="text-sm text-gray-500 mb-1">
+                    Tópico {topic.orden}
+                  </p>
+                  <h3 className="text-xl font-bold">{topic.name}</h3>
+                </div>
+                <div className="flex gap-2">
+                  <button className="text-primary hover:text-primary">
+                    <FaEdit className="h-4 w-4" />
+                  </button>
+                  <button className="text-red-500 hover:text-red-700">
+                    <FaRegTrashAlt className="h-4 w-4" />
+                  </button>
+                  <button onClick={() => toggleLesson(topic.uuid_topic)}>
+                    {expandedTopic.includes(topic.uuid_topic) ? (
+                      <FaChevronDown />
+                    ) : (
+                      <FaChevronUp />
+                    )}
                   </button>
                 </div>
               </div>
-            )}
+
+              {expandedTopic.includes(topic.uuid_topic) && (
+                <div className="border-t bg-[#f9f9f9] p-4 rounded-b-xl">
+                  <button
+                    className="flex items-center gap-2 text-[#0098af] hover:text-[#007d91] font-medium"
+                    onClick={() => handleOpenLessonModal(topic.uuid_topic)}
+                  >
+                    <span className="text-lg">+</span> Agregar Lección
+                  </button>
+                </div>
+              )}
             </div>
-            
           ))
         )}
       </div>
-      {openLessonModal && (
-  <LESSON onClose={() => setOpenLessonModal(false)} />
-)}
+      {openLessonModal && selectedTopicId && (
+        <LESSON
+          topic_uid={selectedTopicId}
+          onClose={() => setOpenLessonModal(false)}
+        />
+      )}
     </div>
   );
 };

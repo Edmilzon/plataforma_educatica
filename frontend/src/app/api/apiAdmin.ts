@@ -118,3 +118,30 @@ export const GET_TOPICS_BY_COURSE = async (
     throw error;
   }
 };
+
+export const CREATE_LESSON = async (lessonData: {
+  title: string;
+  order: number;
+  description: string;
+  resource_url: string;
+  topic_uuid: string;
+}) => {
+  try {
+    const response = await axios.post(`${API_URL}/lesson`, lessonData, {
+      headers: {
+        // eslint-disable-next-line @typescript-eslint/naming-convention
+        "Content-Type": "application/json",
+      },
+    });
+    return response.data;
+  } catch (
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    error: any
+  ) {
+    console.error(
+      "Error al crear la lección:",
+      error.response?.data || error.message,
+    );
+    throw error;
+  }
+};
