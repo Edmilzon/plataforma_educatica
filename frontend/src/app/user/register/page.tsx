@@ -97,13 +97,13 @@ const REGISTER = () => {
   });
 
   const on_submit = async (data: RegisterForm) => {
-    set_loading(true); // ✅ deshabilita el botón mientras se envía
+    set_loading(true);
     try {
       await send_user_data(data);
     } catch (error) {
       handle_error(error);
     } finally {
-      set_loading(false); // ✅ se habilita nuevamente
+      set_loading(false);
     }
   };
 

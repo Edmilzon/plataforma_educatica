@@ -9,7 +9,7 @@ import { useSession } from "next-auth/react";
 
 import DropdownMenu from "@/app/components/DropdownMenu";
 import Navbar from "@/app/components/Navbar";
-import { GET_USERS } from "@/app/api/api";
+import { GET_USERS } from "@/app/api/apiAdmin";
 
 type User = {
   id: string;
