@@ -18,6 +18,8 @@ const CREATE_COURSE = () => {
   const router = useRouter();
   const [courses, setCourses] = useState<Course[]>([]);
   const [isAddingCourse, setIsAddingCourse] = useState(false);
+  /* eslint-disable @typescript-eslint/no-unused-vars */
+  const [token, setToken] = useState("");
   const { data: session } = useSession();
   const [newCourse, setNewCourse] = useState({ title: "", description: "" });
   const [toast, set_toast] = useState<{
@@ -37,15 +39,21 @@ const CREATE_COURSE = () => {
   };
 
   useEffect(() => {
+    if (session?.accessToken) {
+      //console.log(session.accessToken);
+      setToken(session.accessToken);
+    }
+  }, [session]);
+
+  useEffect(() => {
     const fetchCourses = async () => {
       try {
-        const token = sessionStorage.getItem("token");
-        if (!token) {
-          alert("No se encontró el token de autenticación.");
+        if (!session?.accessToken) {
+          console.warn("No hay sesión activa o token no disponible.");
           return;
         }
 
-        const data = await GET_CURSOS(token);
+        const data = await GET_CURSOS(session.accessToken);
         console.log("Cursos obtenidos:", data);
 
         const mappedCourses = data.map((course: any) => ({
@@ -61,7 +69,7 @@ const CREATE_COURSE = () => {
     };
 
     fetchCourses();
-  }, []);
+  }, [session]);
 
   const handleAddCourse = async () => {
     if (newCourse.title.trim() && newCourse.description.trim()) {

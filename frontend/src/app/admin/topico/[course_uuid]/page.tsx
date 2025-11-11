@@ -1,7 +1,13 @@
 "use client";
 import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
-import { FaEdit, FaRegTrashAlt } from "react-icons/fa";
+import {
+  FaEdit,
+  FaRegTrashAlt,
+  FaChevronUp,
+  FaChevronDown,
+} from "react-icons/fa";
+import { useSession } from "next-auth/react";
 
 import Navbar from "@/app/components/Navbar";
 import { CREATE_TOPIC, GET_TOPICS_BY_COURSE } from "@/app/api/apiAdmin";
@@ -23,17 +29,27 @@ const TOPIC = () => {
   const [topics, setTopics] = useState<Topic[]>([]);
   const [isAdding, setIsAdding] = useState(false);
   const [newTopic, setNewTopic] = useState({ name: "", orden: "" });
+  /* eslint-disable @typescript-eslint/no-unused-vars */
+  const [token, setToken] = useState("");
+  const { data: session } = useSession();
+  const [expandedTopic, setExpandedTopic] = useState<string[]>(["1"]);
+  useEffect(() => {
+    if (session?.accessToken) {
+      setToken(session.accessToken);
+    }
+  }, [session]);
 
   useEffect(() => {
     const fetchTopics = async () => {
       try {
-        const token = sessionStorage.getItem("token");
-        if (!token) {
-          alert("No se encontró el token de autenticación.");
+        if (!session?.accessToken) {
+          console.warn("No hay sesión activa o token no disponible.");
           return;
         }
-
-        const data = await GET_TOPICS_BY_COURSE(token, course_uuid as string);
+        const data = await GET_TOPICS_BY_COURSE(
+          session.accessToken,
+          course_uuid as string,
+        );
         console.log("Tópicos obtenidos:", data);
         setTopics(data);
       } catch (error) {
@@ -41,8 +57,8 @@ const TOPIC = () => {
       }
     };
 
-    if (course_uuid) fetchTopics();
-  }, [course_uuid]);
+    if (session && course_uuid) fetchTopics();
+  }, [session, course_uuid]);
 
   const handleAddTopic = async () => {
     if (!newTopic.name.trim() || !newTopic.orden.trim()) {
@@ -51,7 +67,10 @@ const TOPIC = () => {
     }
 
     try {
-      const token = sessionStorage.getItem("token");
+      let token: string | undefined;
+      if (session?.accessToken) {
+        token = session.accessToken;
+      }
       if (!token) {
         alert("No se encontró el token de autenticación.");
         return;
@@ -80,6 +99,13 @@ const TOPIC = () => {
     }
   };
 
+  const toggleLesson = (moduleId: string) => {
+    setExpandedTopic((prev) =>
+      prev.includes(moduleId)
+        ? prev.filter((id) => id !== moduleId)
+        : [...prev, moduleId],
+    );
+  };
   return (
     <div>
       <Navbar />
@@ -168,6 +194,13 @@ const TOPIC = () => {
                 </button>
                 <button className="text-red-500 hover:text-red-700">
                   <FaRegTrashAlt className="h-4 w-4" />
+                </button>
+                <button onClick={() => toggleLesson(topic.uuid)}>
+                  {expandedTopic.includes(topic.uuid) ? (
+                    <FaChevronDown />
+                  ) : (
+                    <FaChevronUp />
+                  )}
                 </button>
               </div>
             </div>
