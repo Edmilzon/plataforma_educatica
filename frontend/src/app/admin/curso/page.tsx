@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { FaRegTrashAlt } from "react-icons/fa";
+import { useSession } from "next-auth/react";
 
 import Navbar from "@/app/components/Navbar";
 import { CREATE_CURSO, GET_CURSOS } from "@/app/api/apiAdmin";
@@ -17,6 +18,7 @@ const CREATE_COURSE = () => {
   const router = useRouter();
   const [courses, setCourses] = useState<Course[]>([]);
   const [isAddingCourse, setIsAddingCourse] = useState(false);
+  const { data: session } = useSession();
   const [newCourse, setNewCourse] = useState({ title: "", description: "" });
   const [toast, set_toast] = useState<{
     message: string;
@@ -64,7 +66,11 @@ const CREATE_COURSE = () => {
   const handleAddCourse = async () => {
     if (newCourse.title.trim() && newCourse.description.trim()) {
       try {
-        const token = sessionStorage.getItem("token");
+        let token: string | undefined;
+        if (session?.accessToken) {
+          token = session.accessToken;
+          //console.log(token + "maaaaaaaaaaaaatate");
+        }
         if (!token) {
           alert("No se encontró el token de autenticación.");
           return;
