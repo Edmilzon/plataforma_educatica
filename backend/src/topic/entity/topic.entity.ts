@@ -21,6 +21,9 @@ export class TopicEntity {
   @Column({ type: 'int' })
   orden: number;
 
+  @Column({ length: 255, nullable: true })
+  comment: string;
+
   @ManyToOne(() => CourseEntity, (course) => course.topics, {
     onDelete: 'CASCADE',
     eager: false,

@@ -10,6 +10,9 @@ export class CreateTopicDto {
   @IsNotEmpty()
   orden: number;
 
+  @IsString()
+  comment: string;
+
   @IsUUID()
   course_uuid: string;
 }

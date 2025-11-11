@@ -52,6 +52,7 @@ export const CREATE_CURSO = async (
       },
       body: JSON.stringify({ title, description }),
     });
+    0;
 
     if (!res.ok) throw new Error("Error al actualizar el rol");
 
@@ -128,6 +129,27 @@ export const CREATE_LESSON = async (lessonData: {
 }) => {
   try {
     const response = await axios.post(`${API_URL}/lesson`, lessonData, {
+      headers: {
+        // eslint-disable-next-line @typescript-eslint/naming-convention
+        "Content-Type": "application/json",
+      },
+    });
+    return response.data;
+  } catch (
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    error: any
+  ) {
+    console.error(
+      "Error al crear la lección:",
+      error.response?.data || error.message,
+    );
+    throw error;
+  }
+};
+
+export const CREATE_COMMENT = async (lessonData: { comment: string }) => {
+  try {
+    const response = await axios.patch(`${API_URL}/topic`, lessonData, {
       headers: {
         // eslint-disable-next-line @typescript-eslint/naming-convention
         "Content-Type": "application/json",
