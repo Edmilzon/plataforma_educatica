@@ -52,7 +52,6 @@ export const CREATE_CURSO = async (
       },
       body: JSON.stringify({ title, description }),
     });
-    0;
 
     if (!res.ok) throw new Error("Error al actualizar el rol");
 

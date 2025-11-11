@@ -35,7 +35,6 @@ const TOPIC = () => {
   const [token, setToken] = useState("");
   const [openLessonModal, setOpenLessonModal] = useState(false);
   const [expandedTopic, setExpandedTopic] = useState<string[]>(["1"]);
-  const [expandedLesson, setExpandedLesson] = useState<string[]>([]);
   const [selectedTopicId, setSelectedTopicId] = useState<string | null>(null);
 
   // Guardar token

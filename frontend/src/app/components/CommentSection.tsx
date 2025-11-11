@@ -1,10 +1,9 @@
 "use client";
 
-import { useState } from "react";
 type TopicRequest = {
   topic_uid: string | null;
 };
-
+/* eslint-disable @typescript-eslint/no-unused-vars*/
 const COMMENT = (topic_uid: TopicRequest) => {
   return (
     <div className="border-t pt-4 mt-4">
