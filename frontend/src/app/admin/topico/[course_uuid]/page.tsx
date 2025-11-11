@@ -11,7 +11,7 @@ import { useSession } from "next-auth/react";
 
 import Navbar from "@/app/components/Navbar";
 import { CREATE_TOPIC, GET_TOPICS_BY_COURSE } from "@/app/api/apiAdmin";
-
+import LESSON from "@/app/components/Lesson";
 type Topic = {
   uuid: string;
   name: string;
@@ -32,6 +32,7 @@ const TOPIC = () => {
   /* eslint-disable @typescript-eslint/no-unused-vars */
   const [token, setToken] = useState("");
   const { data: session } = useSession();
+  const [openLessonModal, setOpenLessonModal] = useState(false);
   const [expandedTopic, setExpandedTopic] = useState<string[]>(["1"]);
   useEffect(() => {
     if (session?.accessToken) {
@@ -173,7 +174,7 @@ const TOPIC = () => {
       </div>
 
       {/*LISRAR TOPICOS*/}
-      <div className="space-y-4 mx-10 mb-10">
+      <div className="space-y-4 mx-10 mb-10 ">
         {topics.length === 0 ? (
           <p className="text-gray-500">No hay tópicos creados aún.</p>
         ) : (
@@ -182,7 +183,8 @@ const TOPIC = () => {
               className="rounded-xl border bg-white shadow-sm p-6 flex justify-between items-center"
               key={topic.uuid || index}
             >
-              <div>
+              <div className="p-6 flex justify-between items-center">
+              <div >
                 <p className="text-sm text-gray-500 mb-1">
                   Tópico {topic.orden}
                 </p>
@@ -204,9 +206,25 @@ const TOPIC = () => {
                 </button>
               </div>
             </div>
+                {expandedTopic.includes(topic.uuid) && (
+                  <div className="border-t bg-[#f9f9f9] p-4 rounded-b-xl">
+                    <div className=" py-4">
+                  <button 
+                  onClick={() => setOpenLessonModal(true)}
+                  className="flex items-center gap-2 text-[#0098af] hover:text-[#007d91] font-medium">
+                    <span className="text-lg">+</span> Agregar Lección
+                  </button>
+                </div>
+              </div>
+            )}
+            </div>
+            
           ))
         )}
       </div>
+      {openLessonModal && (
+  <LESSON onClose={() => setOpenLessonModal(false)} />
+)}
     </div>
   );
 };
