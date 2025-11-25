@@ -4,7 +4,7 @@ import { useState, useRef, useEffect } from "react";
 import { CiSquareMore } from "react-icons/ci";
 import { createPortal } from "react-dom";
 
-import { UPDATE_ROLE } from "../api/api";
+import { UPDATE_ROLE } from "../api/apiAdmin";
 
 type DropdownMenuProps = {
   userId: string;

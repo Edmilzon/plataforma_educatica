@@ -81,6 +81,7 @@ describe('AuthService', () => {
       expect(jwtService.sign).toHaveBeenCalledWith({
         sub: user.uuid_user,
         email: user.email,
+        roles: user.user_role.map((role) => role.role.name),
       });
       expect(result.token).toEqual(token);
     });
@@ -125,6 +126,7 @@ describe('AuthService', () => {
     const userEntity = new UserEntity();
     userEntity.uuid_user = 'google-uuid';
     userEntity.email = googleUser.email;
+    userEntity.user_role = [];
 
     it('should login an existing user', async () => {
       mockUserService.search_email.mockResolvedValue(userEntity);
