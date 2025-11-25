@@ -98,3 +98,79 @@ jobs:
 
       - name: 3. Build Next.js Application
         run: npm run build
+---
+
+  # =======================================================
+  # JOB 3: Despliegue Continuo (CD)
+  # Se ejecuta solo si 'backend-pipeline' y 'frontend-pipeline' son exitosos y la rama es 'main'
+  # =======================================================
+  deploy:
+    name: Despliegue en Servidor Ubuntu (SSH)
+    # Depende de los dos jobs de CI anteriores
+    needs: [backend-pipeline, frontend-pipeline] 
+    
+    # Ejecuta solo cuando el código se pushea a la rama 'main'
+    if: github.ref == 'refs/heads/main' 
+    
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout del Código
+        uses: actions/checkout@v4
+        # Necesario para que el runner tenga el código localmente antes de pasarlo al servidor
+        with:
+          # Usamos la clave SSH para checkout si el repo es privado (opcional, pero buena práctica)
+          ssh-key: ${{ secrets.SSH_PRIVATE_KEY }} 
+
+      # --- 1. Configurar Conexión SSH ---
+      - name: Instalar Clave SSH Privada
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+          
+      - name: Añadir Servidor a known_hosts
+        run: |
+          mkdir -p ~/.ssh
+          # Agrega la llave pública del servidor al archivo known_hosts del runner
+          ssh-keyscan ${{ secrets.SSH_HOST }} >> ~/.ssh/known_hosts
+
+      # --- 2. Ejecutar Despliegue Remoto con Docker Compose ---
+      - name: Ejecutar Despliegue
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USERNAME }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            # Directorio donde se clonará/actualizará el proyecto en tu Ubuntu
+            DEPLOY_DIR="/home/${{ secrets.SSH_USERNAME }}/mi_proyecto" 
+
+            echo "Iniciando Despliegue en Servidor: ${{ secrets.SSH_HOST }}"
+            
+            # 2.1. Clonar/Actualizar el Repositorio
+            if [ ! -d "$DEPLOY_DIR" ]; then
+              echo "Clonando repositorio por primera vez..."
+              # Clonar usando SSH
+              git clone git@github.com:${{ github.repository }}.git $DEPLOY_DIR
+            fi
+            
+            cd $DEPLOY_DIR
+            
+            echo "Actualizando código..."
+            git pull origin main
+
+            # 2.2. Construir y Desplegar con Docker Compose
+            echo "Construyendo nuevas imágenes (Backend & Frontend)..."
+            # Construye las imágenes usando los Dockerfiles y el docker-compose.yml que se acaban de descargar
+            docker compose build
+            
+            echo "Reiniciando servicios con cero downtime (por Docker Compose)..."
+            # Despliega, asegurando que se reinicie el contenedor con las nuevas imágenes
+            docker compose up -d --force-recreate
+            
+            # 2.3. Recargar Nginx (Si fuera necesario actualizar la config de Nginx)
+            # Descomenta si necesitas asegurar que Nginx vea los cambios, aunque solo es necesario para la primera vez.
+            # echo "Recargando Nginx..."
+            # sudo systemctl reload nginx
+
+            echo "Despliegue completado."

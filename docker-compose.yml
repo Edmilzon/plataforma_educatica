@@ -1,0 +1,30 @@
+version: '3.8'
+
+services:
+  # --- SERVICIO BACKEND (NestJS) ---
+  backend:
+    build:
+      context: ./backend # Ruta al Dockerfile del backend
+      dockerfile: Dockerfile
+    image: nestjs-app:latest # Nombre de la imagen para referencia
+    container_name: nestjs_backend
+    restart: always
+    # Expone a la red interna de Docker, no directamente al puerto 3000 del host
+    expose:
+      - 3000 
+    # Archivo .env de producción para variables (e.g., URL de Linki DB)
+    env_file:
+      - ./backend/.env.production 
+
+  # --- SERVICIO FRONTEND (Next.js) ---
+  frontend:
+    build:
+      context: ./frontend # Ruta al Dockerfile del frontend
+      dockerfile: Dockerfile
+    image: nextjs-app:latest
+    container_name: nextjs_frontend
+    restart: always
+    expose:
+      - 3001
+    env_file:
+      - ./frontend/.env.production
