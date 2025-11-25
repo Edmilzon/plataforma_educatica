@@ -1,4 +1,10 @@
-import { IsNotEmpty, IsNumber, IsString, IsUUID } from 'class-validator';
+import {
+  IsNotEmpty,
+  IsNumber,
+  IsOptional,
+  IsString,
+  IsUUID,
+} from 'class-validator';
 import { PartialType } from '@nestjs/mapped-types';
 
 export class CreateTopicDto {
@@ -10,8 +16,9 @@ export class CreateTopicDto {
   @IsNotEmpty()
   orden: number;
 
+  @IsOptional()
   @IsString()
-  comment: string;
+  comment?: string;
 
   @IsUUID()
   course_uuid: string;
